@@ -18,6 +18,7 @@ def main():
     ap.add_argument("outdir")
     ap.add_argument("--target", type=float)
     ap.add_argument("--no-capcut", action="store_true")
+    ap.add_argument("--no-retouch", action="store_true", help="skip CapCut Retouch (a CapCut Pro feature)")
     args = ap.parse_args()
     out = args.outdir
     style = json.load(open(os.path.join(SKILL, "style.json")))
@@ -55,8 +56,12 @@ def main():
             warnings.append(f"CapCut is {have}, template was made with {want}: if the project won't open, "
                             "refresh the template (see SKILL.md, \"CapCut updated\")")
         name = f"{os.path.basename(inv['media_dir'].rstrip('/'))} {datetime.date.today().isoformat()}"
+        retouch = None
+        if style.get("retouch") and not args.no_retouch:
+            retouch = json.load(open(capcut.retouch_path(SKILL)))
         try:
-            draft = capcut.write_draft(shots, inv["media_dir"], template, capcut.drafts_root(), name, size)
+            draft = capcut.write_draft(shots, inv["media_dir"], template, capcut.drafts_root(), name, size,
+                                       retouch=retouch)
         except RuntimeError as e:
             warnings.append(f"CapCut project not written: {e}")
 
@@ -71,7 +76,8 @@ def main():
         print(f"WARNING: {w}")
     print(f"mp4: {reel}")
     if draft:
-        print(f"CapCut project: {os.path.basename(draft)}")
+        print(f"CapCut project: {os.path.basename(draft)}" +
+              (f" (Retouch: {retouch['name']}, needs CapCut Pro to export)" if retouch else ""))
 
 
 if __name__ == "__main__":

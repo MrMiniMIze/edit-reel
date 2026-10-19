@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- **CapCut Retouch by default.** Every clip in the CapCut project gets Retouch > Auto styles ("Native"), captured from a real CapCut project. CapCut runs its own face detection when the project opens, so faces get retouched and food shots are left alone. It's a CapCut Pro feature: say "no retouch" (`--no-retouch`) without Pro. The mp4 preview has no retouch.
+- **Your own retouch look:** set it once on one clip in CapCut and run `capture_retouch.py`; every reel after that uses it.
+
 ## 0.2.0
 
 - **Faster contact sheets**, about 8x: each clip is decoded once instead of once per frame, and sheets are drawn in parallel. A typical day's footage now takes seconds, not minutes.

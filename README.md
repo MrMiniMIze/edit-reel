@@ -19,6 +19,7 @@ Claude picks every shot by **looking** at the footage (bites, sips, reactions, t
 | **Claude Code** | Install it from [claude.com/claude-code](https://claude.com/claude-code). |
 | **ffmpeg-full** | The video engine. The regular `ffmpeg` package is **not** enough (it can't draw text). |
 | **CapCut desktop** *(optional)* | Needed only for the editable project. Tested with **CapCut 9.6.0**. Without it you still get the mp4. |
+| **CapCut Pro** *(optional)* | The CapCut project has CapCut's **Retouch** (Auto styles, "Native") on every clip by default, and that's a Pro feature. No Pro? Just say **"no retouch"**. |
 
 ## Install (one time, about 5 minutes)
 
@@ -48,6 +49,7 @@ Claude picks every shot by **looking** at the footage (bites, sips, reactions, t
 5. When it's done, Claude tells you what it found and gives you numbered steps:
    - **Watch it:** the mp4 is in a new folder next to your clips, called `edit-<date>/reel.mp4`.
    - **Edit it:** open CapCut and click the project named `<folder> <date>`. Clip audio is turned down to 0, not deleted, so you can raise it if you need it.
+   - **Export from CapCut** for the final video: only the CapCut project has the retouch. The mp4 is a quick preview without it.
 
 ## Ask for changes
 
@@ -57,6 +59,8 @@ Just say what you want, in the same Claude Code session:
 - "make it 45 seconds"
 - "the hook is too long, cut it to 4 shots"
 - "drop the parking-lot clip"
+- "no retouch" (for when you don't have CapCut Pro)
+- "use a different retouch look": Claude has you set it up once on one clip in CapCut, and every reel after that uses it.
 
 Claude edits the cut list and rebuilds. Each rebuild becomes a new CapCut project with ` (2)`, ` (3)` and so on added to the name, so earlier versions are kept.
 

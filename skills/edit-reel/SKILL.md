@@ -82,6 +82,8 @@ CapCut must be **fully quit** before the project can be written. If it's running
 python3 "$SKILL_DIR/scripts/build.py" "<output dir>" [--target 45]
 ```
 
+**Retouch is on by default:** every clip in the CapCut project gets CapCut's Retouch > Auto styles look ("Native" unless the user saved their own). It's a CapCut Pro feature, so if the user says they don't have CapCut Pro, or asks for no retouch, add `--no-retouch`. The mp4 never has retouch; only the CapCut project does.
+
 It validates the cut list (fix any errors it lists and rerun), snaps shots to clean frames, drops the weakest actions if the reel runs long, renders `reel.mp4` (silent), and writes the CapCut project. If CapCut isn't installed, has never been opened, or is still running, it skips the project with a warning and the mp4 is still made: relay the warning, and after the user fixes it, rerun build.
 
 ## 8. Report
@@ -93,6 +95,7 @@ Tell the user, briefly:
   1. Watch the reel: `! open "<output dir>/reel.mp4"`
   2. Open **CapCut**, click the project named **`<folder> <date>`** on the home screen.
   3. Clip audio is set to volume 0 (not deleted). Raise it in CapCut if it's needed.
+  - If retouch was applied, add: the CapCut project has Retouch (Native) on every clip; export the final video from CapCut, since the mp4 is a preview without retouch.
   4. Reply with what to change.
 
 ## 9. Revisions
@@ -106,6 +109,14 @@ If build warns that CapCut's version differs from the template's, or the user sa
 1. Give the user these steps: open **CapCut**, click **New project**, import any one video, drag it onto the timeline, wait a few seconds, then quit with **Cmd+Q**. Ask what the project is called on CapCut's home screen (usually a date).
 2. Run `python3 "$SKILL_DIR/scripts/refresh_template.py" "<project name>"`. If it refuses, relay its message; it says what to fix.
 3. Rebuild. Every later build uses the refreshed template automatically. It's kept in `~/Library/Application Support/edit-reel/`, so it survives plugin updates. The user can delete the one-clip project afterwards.
+
+## Change the retouch look
+
+If the user wants a different retouch look on every reel:
+
+1. Give the user these steps: open **CapCut**, click **New project**, import a clip where a face is clearly visible, drag it onto the timeline, click it, open **Video > Retouch**, pick the look under **Auto styles** (and adjust it), wait a few seconds, then quit with **Cmd+Q**. Ask for the project's name on CapCut's home screen.
+2. Run `python3 "$SKILL_DIR/scripts/capture_retouch.py" "<project name>"`.
+3. Rebuild. Every later build uses the saved look.
 
 ## Never
 

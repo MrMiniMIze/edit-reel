@@ -36,6 +36,8 @@
  "fps": 30,
  "_notes": {
   "blur_max": "2026-10-19: max lavfi.blur (2fps, 360px wide) over 144 samples inside the reference editor's shots = 8.63; x1.1 = 9.49. All-footage p95 = 7.37, max = 10.10.",
-  "luma_min": "Darkest used sample YAVG = 33.2; 25 leaves headroom for night shots."
- }
+  "luma_min": "Darkest used sample YAVG = 33.2; 25 leaves headroom for night shots.",
+  "retouch": "CapCut Retouch > Auto styles on every clip of the CapCut project (a CapCut Pro feature). The mp4 has no retouch."
+ },
+ "retouch": true
 }

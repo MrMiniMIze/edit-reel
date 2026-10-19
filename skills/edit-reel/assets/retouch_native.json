@@ -1,0 +1,1107 @@
+{
+ "name": "Native",
+ "capcut_version": "9.6.0",
+ "draft_placeholder": "##_draftpath_placeholder_0E685133-18CE-45ED-8CB8-2904A212EC80_##",
+ "video": {
+  "beauty_face_auto_preset": {
+   "preset_id": "7472289705564982534",
+   "name": "Native",
+   "rate_map": "{\"makeup\":50.0,\"reshape\":50.0,\"retouch\":50.0}",
+   "scene": ""
+  },
+  "beauty_face_auto_preset_infos": [
+   {
+    "face_id": "0",
+    "preset_id": "7472289705564982534",
+    "rate_map": "",
+    "resources_id_list": []
+   }
+  ]
+ },
+ "effects": [
+  {
+   "effect_id": "",
+   "resource_id": "7406274971594394886",
+   "third_resource_id": "",
+   "name": "Internet Celebrity Style",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "exclusion_face",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406274971594394886/54d922e8f85b929b369f81b8bcbd599f",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 22,
+   "category_id": "makeup",
+   "category_name": "Trimming",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "v2",
+   "adjust_params": [],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_stereo_wanggan",
+   "face_adjust_params": [
+    {
+     "face_id": "0",
+     "enable": true,
+     "adjust_params": [
+      {
+       "name": "face_adjust_stereo_wanggan",
+       "value": 0.225,
+       "default_value": 0.0
+      }
+     ],
+     "disable_part": []
+    }
+   ],
+   "exclusion_group": [
+    "face_adjust_stereo"
+   ],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275228231290118",
+   "third_resource_id": "",
+   "name": "Natural",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275228231290118/e4cac4034dbb60c07e895f9cba36e58e",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.1,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "eyebrow_adjust_BiaoZhun",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275346934320389",
+   "third_resource_id": "",
+   "name": "Shape",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275346934320389/37390ef01aa389e2d70b867e389fbafa",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.05,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_brow_ridge",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275483169557765",
+   "third_resource_id": "",
+   "name": "Natural 1",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "exclusion_face",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275483169557765/4d64a5141911c1c66e0c1a3dc1e58c3a",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 22,
+   "category_id": "makeup",
+   "category_name": "Eyebrow",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "v2",
+   "adjust_params": [],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_brow_yeshengmei",
+   "face_adjust_params": [
+    {
+     "face_id": "0",
+     "enable": true,
+     "adjust_params": [
+      {
+       "name": "face_adjust_brow_yeshengmei",
+       "value": 0.225,
+       "default_value": 0.0
+      }
+     ],
+     "disable_part": []
+    }
+   ],
+   "exclusion_group": [
+    "face_adjust_brow"
+   ],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275607484550405",
+   "third_resource_id": "",
+   "name": "Flat",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275607484550405/e4cac4034dbb60c07e895f9cba36e58e",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.1,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "eyebrow_adjust_JianMei",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275643517848838",
+   "third_resource_id": "",
+   "name": "Small Face",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275643517848838/97f83e1ca839d3c686f41001d162e749",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.175,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_YouTaiFace",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275665940532485",
+   "third_resource_id": "",
+   "name": "Stereoscopic Nose",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275665940532485/2672ec7924b75f536446626369fd680b",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.15,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_MaShengNose",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406276505581423878",
+   "third_resource_id": "",
+   "name": "Stereoscopic",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "exclusion_face",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406276505581423878/e0867b835876eef5f2decb1a9b25ad62",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 22,
+   "category_id": "makeup",
+   "category_name": "Highlights",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "v2",
+   "adjust_params": [],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_highlight_litigaoguang",
+   "face_adjust_params": [
+    {
+     "face_id": "0",
+     "enable": true,
+     "adjust_params": [
+      {
+       "name": "face_adjust_highlight_litigaoguang",
+       "value": 0.175,
+       "default_value": 0.0
+      }
+     ],
+     "disable_part": []
+    }
+   ],
+   "exclusion_group": [
+    "face_adjust_highlight"
+   ],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408393706023243013",
+   "third_resource_id": "",
+   "name": "Augmentation",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408393706023243013/1097ba540609affc17f2cfd7f48c6b64",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.1,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_fengchun",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408393759580327174",
+   "third_resource_id": "",
+   "name": "Smooth",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408393759580327174/79751a9251cf799ea193ac6c33cfc362",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 21,
+   "category_id": "auto-beauty2",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.325,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408409685415578885",
+   "third_resource_id": "",
+   "name": "White teeth",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408409685415578885/1d17d59bcdbce6111645a7f98d14c0b7",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 21,
+   "category_id": "auto-beauty2",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.15,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408429681466297606",
+   "third_resource_id": "",
+   "name": "Slim",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408429681466297606/c25078678b01d31423f1b29b00170604",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.075,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_TotalFace",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408429758876273925",
+   "third_resource_id": "",
+   "name": "Natural Nude",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "exclusion_face",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408429758876273925/1309d3ae22dd93d5b5a61bf4b80c193f",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 22,
+   "category_id": "makeup",
+   "category_name": "Lipstick",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "v2",
+   "adjust_params": [],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_lip_houchunColorZRNS",
+   "face_adjust_params": [
+    {
+     "face_id": "0",
+     "enable": true,
+     "adjust_params": [
+      {
+       "name": "face_adjust_lip_houchunColorZRNS",
+       "value": 0.1,
+       "default_value": 0.0
+      }
+     ],
+     "disable_part": []
+    }
+   ],
+   "exclusion_group": [
+    "face_adjust_lip"
+   ],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408429836730977542",
+   "third_resource_id": "",
+   "name": "Bright Eye",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408429836730977542/3cb8994fa65c349935c900a0e7be47ef",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 21,
+   "category_id": "auto-beauty2",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.175,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_BrightEye",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408429911431597318",
+   "third_resource_id": "",
+   "name": "Size",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408429911431597318/9aae998d68fd89d0960a7aee75586713",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.055,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408429966150470917",
+   "third_resource_id": "",
+   "name": "Nude makeup",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "exclusion_face",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408429966150470917/22510b58b68337b3f578ad94e7e19bdc",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 22,
+   "category_id": "makeup",
+   "category_name": "Eye shadow",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "v2",
+   "adjust_params": [],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_eyeshadow_luozhuang",
+   "face_adjust_params": [
+    {
+     "face_id": "0",
+     "enable": true,
+     "adjust_params": [
+      {
+       "name": "face_adjust_eyeshadow_luozhuang",
+       "value": 0.15,
+       "default_value": 0.0
+      }
+     ],
+     "disable_part": []
+    }
+   ],
+   "exclusion_group": [
+    "face_adjust_eyeshadow"
+   ],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408430545371286789",
+   "third_resource_id": "",
+   "name": "Width",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408430545371286789/b425d257fff38df780374ba7470c697a",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.1,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7408430746836208901",
+   "third_resource_id": "",
+   "name": "Jaw",
+   "report_name": "",
+   "type": "figure",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7408430746836208901/c25078678b01d31423f1b29b00170604",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 20,
+   "category_id": "auto-beauty",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [
+    {
+     "name": "0",
+     "value": 0.05,
+     "default_value": 0.0
+    }
+   ],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "face_adjust_ZoomJawbone",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  },
+  {
+   "effect_id": "",
+   "resource_id": "7406275420099824901",
+   "third_resource_id": "7280056145232794113",
+   "name": "makeup-root",
+   "report_name": "",
+   "type": "makeup_root",
+   "sub_type": "auto_beauty",
+   "path": "~/Movies/CapCut/User Data/Cache/effect/7406275420099824901/3def28fb7baa29eb8659eaff6d1d317c",
+   "value": 0.0,
+   "visible": true,
+   "item_effect_type": 0,
+   "category_id": "",
+   "category_name": "",
+   "category_key": "",
+   "sub_category_id": "",
+   "sub_category_name": "",
+   "platform": "all",
+   "apply_target_type": 0,
+   "source_platform": 1,
+   "version": "",
+   "adjust_params": [],
+   "time_range": null,
+   "formula_id": "",
+   "enable_skin_tone_correction": false,
+   "algorithm_artifact_path": "",
+   "intensity_key": "",
+   "face_adjust_params": [],
+   "exclusion_group": [],
+   "panel_id": "",
+   "bloom_params": null,
+   "request_id": "",
+   "color_match_info": {
+    "target_feature_path": "",
+    "source_feature_path": "",
+    "target_image_path": ""
+   },
+   "multi_language_current": "",
+   "lumi_hub_path": "",
+   "covering_relation_change": 0,
+   "beauty_face_auto_preset_id": "7472289705564982534",
+   "beauty_body_auto_preset_id": "",
+   "beauty_face_auto_retouch_info": {
+    "face_id": [],
+    "beauty_face_auto_retouch_id": ""
+   },
+   "smart_color_mode": 0,
+   "is_from_intelligent_quality": false
+  }
+ ]
+}

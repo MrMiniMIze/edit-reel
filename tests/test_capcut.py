@@ -191,5 +191,83 @@ class RefreshTemplateTests(unittest.TestCase):
             self.assertEqual(capcut.template_dir(SKILL_DIR), self.out)
 
 
+def fake_retouched_project(dst):
+    """A one-clip project as CapCut leaves it after Retouch > Auto styles (two effects stand in for 19)."""
+    shutil.copytree(TEMPLATE, dst)
+    info_path = os.path.join(dst, "draft_info.json")
+    info = json.load(open(info_path))
+    v = info["materials"]["videos"][0]
+    v["beauty_face_auto_preset"] = {"preset_id": "747", "name": "Native", "rate_map": "{}", "scene": ""}
+    v["beauty_face_auto_preset_infos"] = [{"face_id": "0", "preset_id": "747", "rate_map": "", "resources_id_list": []}]
+    v["check_flag"] = v["check_flag"] | capcut.RETOUCH_FLAG
+    placeholder = v["path"].split("/Resources/")[0]
+    effects = [{"id": f"E{k}", "resource_id": str(k), "name": n, "type": "figure", "value": 0.0,
+                "path": f"/Users/someone/Movies/CapCut/User Data/Cache/effect/{k}/abc",
+                "algorithm_artifact_path": f"{placeholder}/video/figure_algorithm/{v['id']}",
+                "request_id": "req", "beauty_face_auto_preset_id": "747"} for k, n in enumerate(["Smooth", "Slim"])]
+    info["materials"]["effects"] = effects
+    seg = info["tracks"][0]["segments"][0]
+    seg["extra_material_refs"] = seg["extra_material_refs"][:3] + [e["id"] for e in effects] + seg["extra_material_refs"][3:]
+    json.dump(info, open(info_path, "w"))
+    return dst
+
+
+class RetouchTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        d = self.tmp.name
+        self.media = os.path.join(d, "media"); os.makedirs(self.media)
+        self.root = os.path.join(d, "drafts"); os.makedirs(self.root)
+        json.dump({"all_draft_store": [], "draft_ids": 0}, open(os.path.join(self.root, "root_meta_info.json"), "w"))
+        make_clip(os.path.join(self.media, "a.mp4"), 3.0)
+        make_clip(os.path.join(self.media, "b.mp4"), 2.0)
+        self.shots = [Shot("a.mp4", 0.0, 0.4, "hook", 0, 0), Shot("b.mp4", 0.5, 1.0, "opener", 1, 0),
+                      Shot("a.mp4", 1.0, 1.5, "action", 1, 1)]
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_capture_keeps_the_style_and_drops_this_mac(self):
+        project = fake_retouched_project(os.path.join(self.tmp.name, "proj"))
+        preset = capcut.capture_retouch(project)
+        self.assertEqual(preset["name"], "Native")
+        self.assertEqual([e["name"] for e in preset["effects"]], ["Smooth", "Slim"])
+        raw = json.dumps(preset)
+        for leak in ("/Users/", "someone", '"req"', '"E0"'):
+            self.assertNotIn(leak, raw)
+        self.assertTrue(preset["effects"][0]["path"].startswith("~/Movies/CapCut/"))
+
+    def test_capture_refuses_a_project_without_retouch(self):
+        with self.assertRaises(ValueError) as e:
+            capcut.capture_retouch(TEMPLATE)
+        self.assertIn("Retouch", str(e.exception))
+
+    def write(self, retouch):
+        return capcut.write_draft(self.shots, self.media, TEMPLATE, self.root, "R", size=(720, 1280),
+                                  check_running=False, retouch=retouch)
+
+    def test_retouch_goes_on_every_cut(self):
+        preset = capcut.capture_retouch(fake_retouched_project(os.path.join(self.tmp.name, "proj")))
+        d = json.load(open(os.path.join(self.write(preset), "draft_info.json")))
+        effects = {e["id"]: e for e in d["materials"]["effects"]}
+        self.assertEqual(len(effects), 2 * len(self.shots))  # each cut gets its own copies
+        videos = {v["id"]: v for v in d["materials"]["videos"]}
+        for v in videos.values():
+            self.assertEqual(v["beauty_face_auto_preset"]["name"], "Native")
+            self.assertTrue(v["check_flag"] & capcut.RETOUCH_FLAG)
+        for seg in d["tracks"][0]["segments"]:
+            mine = [effects[r] for r in seg["extra_material_refs"] if r in effects]
+            self.assertEqual([e["name"] for e in mine], ["Smooth", "Slim"])
+            for e in mine:
+                self.assertTrue(e["algorithm_artifact_path"].endswith(f"/video/figure_algorithm/{seg['material_id']}"))
+                self.assertEqual(e["path"], os.path.expanduser(
+                    f"~/Movies/CapCut/User Data/Cache/effect/{e['resource_id']}/abc"))
+
+    def test_no_retouch_means_no_effects(self):
+        d = json.load(open(os.path.join(self.write(None), "draft_info.json")))
+        self.assertEqual(d["materials"].get("effects", []), [])
+        self.assertTrue(all(not v["check_flag"] & capcut.RETOUCH_FLAG for v in d["materials"]["videos"]))
+
+
 if __name__ == "__main__":
     unittest.main()

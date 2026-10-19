@@ -47,6 +47,9 @@ def draft_problem(root):
     return None
 
 
+RETOUCH_FLAG = 1 << 26  # set in a clip's check_flag when Retouch > Auto styles is on
+RETOUCH_VIDEO_KEYS = ("beauty_face_auto_preset", "beauty_face_auto_preset_infos")
+USER_RETOUCH = os.path.expanduser("~/Library/Application Support/edit-reel/retouch.json")
 USER_TEMPLATE = os.path.expanduser("~/Library/Application Support/edit-reel/capcut_template")
 
 
@@ -55,6 +58,40 @@ def template_dir(skill_dir):
     if os.path.exists(os.path.join(USER_TEMPLATE, "draft_info.json")):
         return USER_TEMPLATE
     return os.path.join(skill_dir, "assets", "capcut_template")
+
+
+def retouch_path(skill_dir):
+    """A retouch style captured on this Mac beats the shipped one."""
+    if os.path.exists(USER_RETOUCH):
+        return USER_RETOUCH
+    return os.path.join(skill_dir, "assets", "retouch_native.json")
+
+
+def capture_retouch(project_dir):
+    """Read the Retouch > Auto styles look off a one-clip CapCut project, minus anything tied to this Mac."""
+    info = json.load(open(os.path.join(project_dir, "draft_info.json")))
+    videos = info["materials"].get("videos") or []
+    effects = info["materials"].get("effects") or []
+    if not videos or not effects or not (videos[0].get("beauty_face_auto_preset") or {}).get("name"):
+        raise ValueError(f"'{os.path.basename(project_dir)}' has no Retouch auto style. In CapCut, select the clip, "
+                         "open Video > Retouch, pick a look under Auto styles, quit CapCut (Cmd+Q), and try again.")
+    clean, placeholder = [], ""
+    for e in effects:
+        e = copy.deepcopy(e)
+        e.pop("id", None)
+        e["request_id"] = ""
+        # The downloaded effect lives in CapCut's cache under the user's home; keep it home-relative.
+        cache = e.get("path", "").find("/Movies/CapCut/")
+        e["path"] = "~" + e["path"][cache:] if cache >= 0 else ""
+        algo = e.get("algorithm_artifact_path", "")
+        if "_draftpath_placeholder_" in algo:
+            placeholder = algo.split("/video/")[0]
+        e["algorithm_artifact_path"] = ""  # CapCut's face data for one clip; rebuilt per clip
+        clean.append(e)
+    v = videos[0]
+    return {"name": v["beauty_face_auto_preset"]["name"], "capcut_version": capcut_version(),
+            "draft_placeholder": placeholder,
+            "video": {k: copy.deepcopy(v[k]) for k in RETOUCH_VIDEO_KEYS if k in v}, "effects": clean}
 
 
 def _template_problem(project_dir):
@@ -138,8 +175,12 @@ def _write_json(path, data):
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
 
-def _build_timeline(info, shots, media_dir, size, dst):
+def _build_timeline(info, shots, media_dir, size, dst, retouch=None):
     tvid = info["materials"]["videos"][0]
+    if "_draftpath_placeholder_" in tvid["path"]:
+        draft_ref = tvid["path"].split("/Resources/")[0]
+    else:
+        draft_ref = (retouch or {}).get("draft_placeholder") or dst
     # CapCut either copies clips into the project (a "##_draftpath_placeholder_<id>_##/Resources/..." path)
     # or links them in place (an absolute path). Follow the template; clips are copied into dst either way.
     if "_draftpath_placeholder_" in tvid["path"]:
@@ -157,11 +198,14 @@ def _build_timeline(info, shots, media_dir, size, dst):
         v.update(id=_uid(), unique_id=uuid.uuid4().hex, duration=int(p["duration"] * US), width=p["width"],
                  height=p["height"], has_audio=p["has_audio"], material_name=src,
                  path=f"{local}/{src}", local_material_id=str(uuid.uuid4()))
+        if retouch:
+            v.update(copy.deepcopy(retouch["video"]))
+            v["check_flag"] = v.get("check_flag", 0) | RETOUCH_FLAG
         videos.append(v)
         by_src[src] = v
 
     helpers = {k: [] for k in tmpl_help}
-    segments, t = [], 0
+    segments, t, effects = [], 0, []
     for s in shots:
         refs = []
         for k in tmpl_help:
@@ -172,6 +216,15 @@ def _build_timeline(info, shots, media_dir, size, dst):
             helpers[k].append(m)
             refs.append(m["id"])
         v = by_src[s.src]
+        if retouch:  # each cut gets its own copies, placed after the first three helpers as CapCut does
+            mine = []
+            for e in retouch["effects"]:
+                e = copy.deepcopy(e)
+                e.update(id=_uid(), path=os.path.expanduser(e["path"]) if e["path"] else "",
+                         algorithm_artifact_path=f"{draft_ref}/video/figure_algorithm/{v['id']}")
+                mine.append(e)
+            effects += mine
+            refs = refs[:3] + [e["id"] for e in mine] + refs[3:]
         src_in = int(round(s.src_in * US))
         dur = min(int(round(s.dur * US)), v["duration"] - src_in)
         seg = copy.deepcopy(tseg)
@@ -187,11 +240,12 @@ def _build_timeline(info, shots, media_dir, size, dst):
     info["canvas_config"].update(ratio="original", width=size[0], height=size[1])
     info["materials"]["videos"] = videos
     info["materials"].update(helpers)
+    info["materials"]["effects"] = effects
     info["tracks"] = [dict(info["tracks"][0], segments=segments)]
     return info, videos
 
 
-def write_draft(shots, media_dir, template_dir, root, name, size, check_running=True):
+def write_draft(shots, media_dir, template_dir, root, name, size, check_running=True, retouch=None):
     if check_running and capcut_running():
         raise RuntimeError("CapCut is running — quit it (Cmd+Q) and retry")
     name = _free_name(root, name)
@@ -200,7 +254,7 @@ def write_draft(shots, media_dir, template_dir, root, name, size, check_running=
     with open(root_meta_path, "rb") as f:
         original_root_meta = f.read()
     try:
-        return _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path)
+        return _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path, retouch)
     except BaseException:
         # A half-written project shows up in CapCut as broken, so undo everything.
         shutil.rmtree(dst, ignore_errors=True)
@@ -212,13 +266,13 @@ def write_draft(shots, media_dir, template_dir, root, name, size, check_running=
         raise
 
 
-def _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path):
+def _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path, retouch):
     shutil.copytree(template_dir, dst, ignore=shutil.ignore_patterns("TEMPLATE_INFO.json", "*.bak"))
 
     info = json.load(open(os.path.join(template_dir, "draft_info.json")))
     meta = json.load(open(os.path.join(template_dir, "draft_meta_info.json")))
     old_tl, old_draft = info["id"], meta["draft_id"]
-    info, videos = _build_timeline(info, shots, media_dir, size, dst)
+    info, videos = _build_timeline(info, shots, media_dir, size, dst, retouch)
     new_tl, new_draft = info["id"], _uid()
 
     os.rename(os.path.join(dst, "Timelines", old_tl), os.path.join(dst, "Timelines", new_tl))
