@@ -44,7 +44,7 @@ Claude picks every shot by **looking** at the footage (bites, sips, reactions, t
    make a reel from ~/Desktop/sunday-clips
    ```
    For a different length, say so: `make a 45 second reel from ~/Desktop/sunday-clips`. Anything from 30s to 90s works.
-4. Wait. Claude prepares contact sheets (about 2 minutes per 4 minutes of footage), looks through every frame, picks the shots, and renders.
+4. Wait. Claude prepares contact sheets (under a minute for a typical day's footage), looks through every frame, picks the shots, and renders.
 5. When it's done, Claude tells you what it found and gives you numbered steps:
    - **Watch it:** the mp4 is in a new folder next to your clips, called `edit-<date>/reel.mp4`.
    - **Edit it:** open CapCut and click the project named `<folder> <date>`. Clip audio is turned down to 0, not deleted, so you can raise it if you need it.
@@ -65,7 +65,7 @@ Claude edits the cut list and rebuilds. Each rebuild becomes a new CapCut projec
 - **One outing per folder.** Clips are put in the order they were filmed, using the phone's capture time. AirDrop keeps that time. If it's missing (some apps strip it), filename order is used instead.
 - **Film the food on its own for a second** before eating. That makes the best opener for each stop.
 - **Bright beats dark.** Very dark or shaky moments are skipped automatically.
-- Vertical clips look best. Horizontal clips are center-cropped to 9:16.
+- Vertical clips look best. Clips straight off an iPhone are handled upright; horizontal clips are center-cropped to 9:16.
 
 ## Troubleshooting
 
@@ -74,7 +74,7 @@ Claude edits the cut list and rebuilds. Each rebuild becomes a new CapCut projec
 | "This Mac isn't ready" | Follow the fix it prints. Usually it's `brew install ffmpeg-full`. |
 | "CapCut project not written: CapCut is running" | Quit CapCut with **Cmd+Q**, then say "rebuild". |
 | "CapCut project not written: never opened" | Open CapCut once, quit it, then say "rebuild". |
-| The CapCut project won't open, or a version warning appears | Your CapCut version differs from the tested 9.6.0. The mp4 is still fine. Please [open an issue](https://github.com/MrMiniMIze/edit-reel/issues) with your CapCut version. |
+| The CapCut project won't open, or a version warning appears | CapCut has updated since the template was made. Say **"CapCut updated, refresh the template"**: Claude has you make a one-clip project in CapCut and rebuilds the template from it (takes a minute). The mp4 is unaffected. If that doesn't fix it, please [open an issue](https://github.com/MrMiniMIze/edit-reel/issues) with your CapCut version. |
 | The project isn't on CapCut's home screen | Quit and reopen CapCut. |
 
 To check your setup at any time, ask Claude Code: "run the edit-reel setup check".
@@ -97,7 +97,7 @@ clips/ ──prepare.py──▶ inventory + quality screen + labeled contact sh
 - **`cutlist.json`** in the output folder is the single source of truth. Every shot has a `why`, so you can read (or hand-edit) the edit.
 - The style numbers (length, hook shot length, pace, blur limits) live in [`skills/edit-reel/style.json`](skills/edit-reel/style.json). Change them to suit a different style.
 
-The CapCut project is written by cloning a small template project made by CapCut itself. CapCut's project format isn't officially documented, so a big CapCut update could break that part. The mp4 doesn't depend on it.
+The CapCut project is written by cloning a small template project made by CapCut itself. CapCut's project format isn't officially documented, so a CapCut update can break that part. When it does, the template can be rebuilt from your own CapCut in a minute (see Troubleshooting). The mp4 never depends on it.
 
 ## Development
 

@@ -48,12 +48,12 @@ def main():
     if problem:
         warnings.append(f"CapCut project not written: {problem}")
     elif not args.no_capcut:
-        template = os.path.join(SKILL, "assets", "capcut_template")
+        template = capcut.template_dir(SKILL)
         want = json.load(open(os.path.join(template, "TEMPLATE_INFO.json")))["capcut_version"]
         have = capcut.capcut_version()
         if have != want:
             warnings.append(f"CapCut is {have}, template was made with {want}: if the project won't open, "
-                            "create one empty project in CapCut and refresh the template")
+                            "refresh the template (see SKILL.md, \"CapCut updated\")")
         name = f"{os.path.basename(inv['media_dir'].rstrip('/'))} {datetime.date.today().isoformat()}"
         try:
             draft = capcut.write_draft(shots, inv["media_dir"], template, capcut.drafts_root(), name, size)

@@ -23,6 +23,12 @@ class IngestTests(unittest.TestCase):
         self.assertEqual(info["fps"], 30)
         self.assertIs(info["has_audio"], True)
 
+    def test_probe_reports_upright_size_for_rotated_clip(self):
+        p = make_clip(os.path.join(self.dir, "portrait.mov"), 0.5, size=(1280, 720), rotation=90)
+        info = common.probe(p)
+        self.assertEqual((info["width"], info["height"]), (720, 1280))
+        self.assertEqual(info["rotation"], 90)
+
     def test_inventory_sorts_by_capture_time(self):
         make_clip(os.path.join(self.dir, "b.mp4"), 0.5, creation="2026-10-01T10:00:00Z")
         make_clip(os.path.join(self.dir, "a.mp4"), 0.5, creation="2026-10-01T11:00:00Z")

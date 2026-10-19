@@ -22,6 +22,15 @@ def prefer_full_ffmpeg(dirs=FULL_FFMPEG_DIRS):
 prefer_full_ffmpeg()
 
 
+def grid_select(step):
+    """ffmpeg select= that keeps the first frame at or after every multiple of step, as seeking there would.
+
+    (fps= is not a substitute: it keeps the last frame of each slot, up to step/2 after the time it reports.)
+    """
+    slot = f"floor((t+1e-6)/{step:.6f})"
+    return f"select='isnan(prev_t)+gt({slot},{slot.replace('(t+', '(prev_t+')})'"
+
+
 def media_kind(path):
     ext = os.path.splitext(path)[1].lower()
     if ext in VIDEO_EXTS:
@@ -41,10 +50,17 @@ def probe(path):
     video = next(s for s in d["streams"] if s["codec_type"] == "video")
     rate = Fraction(video.get("r_frame_rate", "0/1"))
     fps = round(float(rate), 3) if rate else 0.0
+    # Phones store portrait video sideways plus a rotation tag; ffmpeg decodes it upright, so report that size.
+    rotation = next((int(s.get("rotation", 0)) for s in video.get("side_data_list", [])
+                     if s.get("side_data_type") == "Display Matrix"), 0) % 360
+    w, h = int(video["width"]), int(video["height"])
+    if rotation in (90, 270):
+        w, h = h, w
     return {
         "duration": float(d["format"].get("duration", 0.0)),
-        "width": int(video["width"]),
-        "height": int(video["height"]),
+        "width": w,
+        "height": h,
+        "rotation": rotation,
         "fps": int(fps) if fps == int(fps) else fps,
         "has_audio": any(s["codec_type"] == "audio" for s in d["streams"]),
     }

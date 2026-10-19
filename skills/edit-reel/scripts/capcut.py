@@ -4,9 +4,11 @@ CapCut 9.6 drafts are plaintext JSON. Times are microseconds. Each segment needs
 copies of six helper materials, and the same timeline JSON lives in several files.
 """
 import copy
+import datetime
 import json
 import os
 import plistlib
+import re
 import shutil
 import subprocess
 import time
@@ -45,6 +47,80 @@ def draft_problem(root):
     return None
 
 
+USER_TEMPLATE = os.path.expanduser("~/Library/Application Support/edit-reel/capcut_template")
+
+
+def template_dir(skill_dir):
+    """A template refreshed on this Mac beats the shipped one: it matches the installed CapCut."""
+    if os.path.exists(os.path.join(USER_TEMPLATE, "draft_info.json")):
+        return USER_TEMPLATE
+    return os.path.join(skill_dir, "assets", "capcut_template")
+
+
+def _template_problem(project_dir):
+    try:
+        info = json.load(open(os.path.join(project_dir, "draft_info.json")))
+        meta = json.load(open(os.path.join(project_dir, "draft_meta_info.json")))
+    except (OSError, ValueError) as e:
+        return f"its project files can't be read ({e})"
+    videos = info.get("materials", {}).get("videos") or []
+    tracks = info.get("tracks") or []
+    if len(videos) != 1 or not tracks or not tracks[0].get("segments"):
+        return "it needs exactly one video clip on the timeline"
+    if not os.path.isdir(os.path.join(project_dir, "Timelines", info.get("id", ""))):
+        return "its timeline folder is missing"
+    if "draft_id" not in meta or not meta.get("draft_materials"):
+        return "its project info is incomplete"
+    return None
+
+
+def refresh_template(project_dir, dst):
+    """Turn a one-clip project made by the installed CapCut into a clean template at dst."""
+    problem = _template_problem(project_dir)
+    if problem:
+        raise ValueError(f"'{os.path.basename(project_dir)}' can't be used as a template: {problem}. In CapCut, "
+                         "make a new project, add one video clip to the timeline, quit CapCut (Cmd+Q), and try again.")
+    tmp = dst + ".new"
+    shutil.rmtree(tmp, ignore_errors=True)
+    shutil.copytree(project_dir, tmp, ignore=shutil.ignore_patterns("*.bak", "TEMPLATE_INFO.json"))
+    local = os.path.join(tmp, "Resources", "local")
+    for f in os.listdir(local) if os.path.isdir(local) else []:
+        os.remove(os.path.join(local, f))
+    clip = json.load(open(os.path.join(tmp, "draft_info.json")))["materials"]["videos"][0]["material_name"]
+    # Keep nothing that identifies the Mac, its user, or the clip.
+    subs = [(re.compile(r'"(device_id|hard_disk_id|mac_address)":"[^"]*"'), r'"\1":""'),
+            (re.compile(r'"/Users/[^"]*"'), '""'),
+            (re.compile(r'"draft_name":"[^"]*"'), '"draft_name":"template"'),
+            (re.compile(re.escape(json.dumps(clip))), json.dumps("clip" + os.path.splitext(clip)[1]))]
+    for dp, _, fs in os.walk(tmp):
+        for f in fs:
+            p = os.path.join(dp, f)
+            if f == "mini_draft.json":  # cached patches would replay the old timeline
+                os.remove(p)
+                continue
+            if f == "draft_cover.jpg":
+                subprocess.run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "lavfi", "-i",
+                                "color=c=black:s=1080x1920", "-frames:v", "1", p], check=True)
+                continue
+            try:
+                text = open(p, encoding="utf-8").read()
+            except (UnicodeDecodeError, OSError):
+                continue
+            new = text
+            for pattern, repl in subs:
+                new = pattern.sub(repl, new)
+            if new != text:
+                with open(p, "w", encoding="utf-8") as fh:
+                    fh.write(new)
+    _write_json(os.path.join(tmp, "TEMPLATE_INFO.json"),
+                {"capcut_version": capcut_version(), "made": datetime.date.today().isoformat(),
+                 "source": "refreshed from a one-clip CapCut project; machine IDs, paths and media removed"})
+    shutil.rmtree(dst, ignore_errors=True)
+    os.makedirs(os.path.dirname(os.path.abspath(dst)), exist_ok=True)
+    os.rename(tmp, dst)
+    return dst
+
+
 def _uid():
     return str(uuid.uuid4()).upper()
 
@@ -62,10 +138,16 @@ def _write_json(path, data):
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
 
-def _build_timeline(info, shots, media_dir, size):
+def _build_timeline(info, shots, media_dir, size, dst):
     tvid = info["materials"]["videos"][0]
-    placeholder = tvid["path"].split("/Resources/")[0]
-    tmpl_help = {k: info["materials"][k][0] for k in HELPERS}
+    # CapCut either copies clips into the project (a "##_draftpath_placeholder_<id>_##/Resources/..." path)
+    # or links them in place (an absolute path). Follow the template; clips are copied into dst either way.
+    if "_draftpath_placeholder_" in tvid["path"]:
+        local = tvid["path"].split("/Resources/")[0] + "/Resources/local"
+    else:
+        local = os.path.join(dst, "Resources", "local")
+    # Clone only the helper kinds this CapCut version actually uses.
+    tmpl_help = {k: info["materials"][k][0] for k in HELPERS if info["materials"].get(k)}
     tseg = info["tracks"][0]["segments"][0]
 
     videos, by_src = [], {}
@@ -74,15 +156,15 @@ def _build_timeline(info, shots, media_dir, size):
         v = copy.deepcopy(tvid)
         v.update(id=_uid(), unique_id=uuid.uuid4().hex, duration=int(p["duration"] * US), width=p["width"],
                  height=p["height"], has_audio=p["has_audio"], material_name=src,
-                 path=f"{placeholder}/Resources/local/{src}", local_material_id=str(uuid.uuid4()))
+                 path=f"{local}/{src}", local_material_id=str(uuid.uuid4()))
         videos.append(v)
         by_src[src] = v
 
-    helpers = {k: [] for k in HELPERS}
+    helpers = {k: [] for k in tmpl_help}
     segments, t = [], 0
     for s in shots:
         refs = []
-        for k in HELPERS:
+        for k in tmpl_help:
             m = copy.deepcopy(tmpl_help[k])
             m["id"] = _uid()
             if k == "speeds":
@@ -114,18 +196,36 @@ def write_draft(shots, media_dir, template_dir, root, name, size, check_running=
         raise RuntimeError("CapCut is running — quit it (Cmd+Q) and retry")
     name = _free_name(root, name)
     dst = os.path.join(root, name)
+    root_meta_path = os.path.join(root, "root_meta_info.json")
+    with open(root_meta_path, "rb") as f:
+        original_root_meta = f.read()
+    try:
+        return _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path)
+    except BaseException:
+        # A half-written project shows up in CapCut as broken, so undo everything.
+        shutil.rmtree(dst, ignore_errors=True)
+        with open(root_meta_path, "rb") as f:
+            changed = f.read() != original_root_meta
+        if changed:
+            with open(root_meta_path, "wb") as f:
+                f.write(original_root_meta)
+        raise
+
+
+def _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path):
     shutil.copytree(template_dir, dst, ignore=shutil.ignore_patterns("TEMPLATE_INFO.json", "*.bak"))
 
     info = json.load(open(os.path.join(template_dir, "draft_info.json")))
     meta = json.load(open(os.path.join(template_dir, "draft_meta_info.json")))
     old_tl, old_draft = info["id"], meta["draft_id"]
-    info, videos = _build_timeline(info, shots, media_dir, size)
+    info, videos = _build_timeline(info, shots, media_dir, size, dst)
     new_tl, new_draft = info["id"], _uid()
 
     os.rename(os.path.join(dst, "Timelines", old_tl), os.path.join(dst, "Timelines", new_tl))
     for rel in ["", f"Timelines/{new_tl}/"]:  # cached patches would replay the template's timeline
         if os.path.exists(os.path.join(dst, rel, "attachment/patch/mini_draft.json")):
             os.remove(os.path.join(dst, rel, "attachment/patch/mini_draft.json"))
+    os.makedirs(os.path.join(dst, "Resources", "local"), exist_ok=True)
     for src in dict.fromkeys(s.src for s in shots):
         shutil.copy2(os.path.join(media_dir, src), os.path.join(dst, "Resources", "local", src))
 
@@ -156,7 +256,6 @@ def write_draft(shots, media_dir, template_dir, root, name, size, check_running=
     meta["draft_materials"][0]["value"] = mats
     _write_json(os.path.join(dst, "draft_meta_info.json"), meta)
 
-    root_meta_path = os.path.join(root, "root_meta_info.json")
     shutil.copy2(root_meta_path, root_meta_path + ".bak-edit-reel")
     root_meta = json.load(open(root_meta_path))
     entry = {k: meta.get(k, "") for k in ("cloud_draft_cover", "cloud_draft_sync", "draft_cloud_last_action_download",

@@ -5,12 +5,15 @@ import re
 import subprocess
 import sys
 
+import common
+
 
 def sample_quality(path, fps):
     """One ffmpeg pass; returns [{t, blur, luma}] for frames sampled at `fps`."""
     out = subprocess.run(
         ["ffmpeg", "-hide_banner", "-loglevel", "error", "-i", path, "-an",
-         "-vf", f"fps={fps},scale=360:-2,blurdetect,signalstats,metadata=print:file=-", "-f", "null", "-"],
+         "-vf", f"{common.grid_select(1 / fps)},scale=360:-2,blurdetect,signalstats,metadata=print:file=-",
+         "-fps_mode", "passthrough", "-f", "null", "-"],
         capture_output=True, text=True, check=True).stdout
     samples, cur = [], None
     for line in out.splitlines():

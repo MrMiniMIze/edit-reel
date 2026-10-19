@@ -22,7 +22,7 @@ python3 "$SKILL_DIR/scripts/prepare.py" "<media folder>"
 
 It first checks the Mac is ready (ffmpeg with the needed filters, macOS). If it prints **"This Mac isn't ready"**, show the user each problem and its fix exactly as printed, as numbered steps, and stop until they've fixed it. `python3 "$SKILL_DIR/scripts/check.py"` reruns just the check.
 
-Then it prints the output dir (`edit-<date>` next to the media folder), the clip count, the ordering, and the sheet count. It takes about 2 minutes for 4 minutes of footage. Photos are skipped.
+Then it prints the output dir (`edit-<date>` next to the media folder), the clip count, the ordering, and the sheet count. It takes well under a minute for a typical day's footage. Photos are skipped.
 
 ## 3. Look at every sheet
 
@@ -98,6 +98,14 @@ Tell the user, briefly:
 ## 9. Revisions
 
 Edit `cutlist.json` for the requested change, for example swapping a shot (go back to the sheets for the alternative), shortening a stop, or changing the length with `--target`. Then rerun build. Don't re-pick everything unless asked. Each build writes a new CapCut project named with a ` (2)`, ` (3)` suffix, so earlier versions are kept.
+
+## CapCut updated (the project won't open)
+
+If build warns that CapCut's version differs from the template's, or the user says the CapCut project won't open, rebuild the template from their own CapCut:
+
+1. Give the user these steps: open **CapCut**, click **New project**, import any one video, drag it onto the timeline, wait a few seconds, then quit with **Cmd+Q**. Ask what the project is called on CapCut's home screen (usually a date).
+2. Run `python3 "$SKILL_DIR/scripts/refresh_template.py" "<project name>"`. If it refuses, relay its message; it says what to fix.
+3. Rebuild. Every later build uses the refreshed template automatically. It's kept in `~/Library/Application Support/edit-reel/`, so it survives plugin updates. The user can delete the one-clip project afterwards.
 
 ## Never
 

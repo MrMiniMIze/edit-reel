@@ -1,5 +1,6 @@
 import json
 import os
+import shutil
 import tempfile
 import unittest
 from unittest import mock
@@ -66,9 +67,128 @@ class CapcutTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 capcut.write_draft(self.shots, self.media, TEMPLATE, self.root, "X", size=(720, 1280))
 
+    def test_failed_write_leaves_nothing_behind(self):
+        root_meta = open(os.path.join(self.root, "root_meta_info.json")).read()
+        real_copy = capcut.shutil.copy2
+
+        def disk_full(src, dst, *a, **k):
+            if src.endswith("b.mp4"):
+                raise OSError(28, "No space left on device")
+            return real_copy(src, dst, *a, **k)
+
+        with mock.patch("capcut.shutil.copy2", side_effect=disk_full):
+            with self.assertRaises(OSError):
+                self.write("Broken")
+        self.assertEqual(sorted(os.listdir(self.root)), ["root_meta_info.json"])
+        self.assertEqual(open(os.path.join(self.root, "root_meta_info.json")).read(), root_meta)
+
+    def test_failed_root_meta_write_is_restored(self):
+        root_meta = open(os.path.join(self.root, "root_meta_info.json")).read()
+        real_write = capcut._write_json
+
+        def fail_on_root(path, data):
+            if path.endswith("root_meta_info.json"):
+                with open(path, "w") as f:
+                    f.write("{trunc")
+                raise OSError(28, "No space left on device")
+            return real_write(path, data)
+
+        with mock.patch("capcut._write_json", side_effect=fail_on_root):
+            with self.assertRaises(OSError):
+                self.write("Broken")
+        self.assertEqual(open(os.path.join(self.root, "root_meta_info.json")).read(), root_meta)
+        self.assertFalse(os.path.exists(os.path.join(self.root, "Broken")))
+
     def test_root_meta_backed_up(self):
         self.write()
         self.assertTrue(os.path.exists(os.path.join(self.root, "root_meta_info.json.bak-edit-reel")))
+
+
+class RefreshTemplateTests(unittest.TestCase):
+    """A CapCut update can break the shipped template; anyone can rebuild it from a fresh one-clip project."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        d = self.tmp.name
+        self.project = os.path.join(d, "drafts", "My Project")
+        shutil.copytree(TEMPLATE, self.project)
+        os.remove(os.path.join(self.project, "TEMPLATE_INFO.json"))
+        # What CapCut leaves in a real project: the clip, backups, this Mac's IDs and paths.
+        open(os.path.join(self.project, "Resources", "local", "IMG_0001.MOV"), "wb").write(b"video")
+        open(os.path.join(self.project, "draft_info.json.bak"), "w").write("{}")
+        info_path = os.path.join(self.project, "draft_info.json")
+        raw = open(info_path).read().replace('"device_id":""', '"device_id":"0123abcd"', 1)
+        raw = raw.replace('"material_name":"clip.MP4"', '"material_name":"IMG_0001.MOV"')
+        open(info_path, "w").write(raw)
+        meta_path = os.path.join(self.project, "draft_meta_info.json")
+        meta = json.load(open(meta_path))
+        meta["draft_fold_path"] = "/Users/someone/Movies/CapCut/My Project"
+        json.dump(meta, open(meta_path, "w"))
+        self.out = os.path.join(d, "template")
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def refresh(self):
+        with mock.patch("capcut.capcut_version", return_value="9.9.9"):
+            return capcut.refresh_template(self.project, self.out)
+
+    def test_refreshed_template_is_clean_and_versioned(self):
+        self.refresh()
+        self.assertEqual(json.load(open(os.path.join(self.out, "TEMPLATE_INFO.json")))["capcut_version"], "9.9.9")
+        self.assertEqual(os.listdir(os.path.join(self.out, "Resources", "local")), [])
+        for dp, _, fs in os.walk(self.out):
+            for f in fs:
+                self.assertFalse(f.endswith(".bak"), f)
+                if f.endswith((".json", ".tmp")):
+                    text = open(os.path.join(dp, f)).read()
+                    for leak in ("/Users/", "0123abcd", "IMG_0001"):
+                        self.assertNotIn(leak, text, f"{leak} in {f}")
+
+    def test_refreshed_template_builds_a_draft(self):
+        self.refresh()
+        media = os.path.join(self.tmp.name, "media"); os.makedirs(media)
+        make_clip(os.path.join(media, "a.mp4"), 2.0)
+        root = os.path.join(self.tmp.name, "drafts")
+        json.dump({"all_draft_store": [], "draft_ids": 0}, open(os.path.join(root, "root_meta_info.json"), "w"))
+        path = capcut.write_draft([Shot("a.mp4", 0.0, 1.0, "opener", 1, 0)], media, self.out, root, "R",
+                                  size=(720, 1280), check_running=False)
+        d = json.load(open(os.path.join(path, "draft_info.json")))
+        self.assertEqual(d["materials"]["videos"][0]["material_name"], "a.mp4")
+
+    def test_project_linking_its_clip_in_place_works(self):
+        # CapCut can link the original file instead of copying it into the project.
+        info_path = os.path.join(self.project, "draft_info.json")
+        info = json.load(open(info_path))
+        info["materials"]["videos"][0]["path"] = "/Users/someone/Desktop/IMG_0001.MOV"
+        json.dump(info, open(info_path, "w"))
+        shutil.rmtree(os.path.join(self.project, "Resources", "local"))  # such projects have no local folder
+        self.refresh()
+        media = os.path.join(self.tmp.name, "media"); os.makedirs(media)
+        make_clip(os.path.join(media, "a.mp4"), 2.0)
+        root = os.path.join(self.tmp.name, "drafts")
+        json.dump({"all_draft_store": [], "draft_ids": 0}, open(os.path.join(root, "root_meta_info.json"), "w"))
+        path = capcut.write_draft([Shot("a.mp4", 0.0, 1.0, "opener", 1, 0)], media, self.out, root, "R",
+                                  size=(720, 1280), check_running=False)
+        v = json.load(open(os.path.join(path, "draft_info.json")))["materials"]["videos"][0]
+        self.assertEqual(v["path"], os.path.join(path, "Resources", "local", "a.mp4"))
+        self.assertTrue(os.path.exists(v["path"]))
+
+    def test_project_without_a_clip_is_refused(self):
+        info_path = os.path.join(self.project, "draft_info.json")
+        info = json.load(open(info_path))
+        info["materials"]["videos"] = []
+        json.dump(info, open(info_path, "w"))
+        with self.assertRaises(ValueError) as e:
+            self.refresh()
+        self.assertIn("one video clip", str(e.exception))
+        self.assertFalse(os.path.exists(self.out))
+
+    def test_build_prefers_a_refreshed_template(self):
+        with mock.patch("capcut.USER_TEMPLATE", self.out):
+            self.assertEqual(capcut.template_dir(SKILL_DIR), os.path.join(SKILL_DIR, "assets", "capcut_template"))
+            self.refresh()
+            self.assertEqual(capcut.template_dir(SKILL_DIR), self.out)
 
 
 if __name__ == "__main__":
