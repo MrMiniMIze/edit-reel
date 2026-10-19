@@ -1,0 +1,41 @@
+{
+ "length": {
+  "target": 60,
+  "min": 30,
+  "max": 90,
+  "tolerance": 5
+ },
+ "hook": {
+  "shot_dur": 0.4,
+  "min_shots": 3,
+  "max_shots": 8
+ },
+ "body": {
+  "opener_dur": 1.0,
+  "shot_min": 0.4,
+  "shot_max": 2.0,
+  "shot_mean": 1.0,
+  "actions_per_stop": [
+   2,
+   7
+  ]
+ },
+ "screen": {
+  "fps": 2.0,
+  "blur_max": 9.49,
+  "luma_min": 25
+ },
+ "sheets": {
+  "max_frames": 600,
+  "base_fps": 2.0,
+  "cols": 4,
+  "rows": 4
+ },
+ "use_photos": false,
+ "speed": 1.0,
+ "fps": 30,
+ "_notes": {
+  "blur_max": "2026-10-19: max lavfi.blur (2fps, 360px wide) over 144 samples inside the reference editor's shots = 8.63; x1.1 = 9.49. All-footage p95 = 7.37, max = 10.10.",
+  "luma_min": "Darkest used sample YAVG = 33.2; 25 leaves headroom for night shots."
+ }
+}

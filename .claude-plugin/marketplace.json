@@ -1,0 +1,14 @@
+{
+  "name": "edit-reel",
+  "description": "Auto-edit raw phone clips into short vertical reels with Claude Code.",
+  "owner": {
+    "name": "Christopher Pena"
+  },
+  "plugins": [
+    {
+      "name": "edit-reel",
+      "source": "./",
+      "description": "Turn a folder of raw phone clips into a ~60s vertical reel (silent mp4 + editable CapCut project)."
+    }
+  ]
+}
