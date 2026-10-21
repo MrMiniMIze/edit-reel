@@ -55,6 +55,11 @@ class CapcutTests(unittest.TestCase):
         d = json.load(open(os.path.join(self.write(), "draft_info.json")))
         self.assertTrue(all(s["volume"] == 0.0 for s in d["tracks"][0]["segments"]))
 
+    def test_talk_keeps_its_sound(self):
+        self.shots.append(Shot("b.mp4", 0.0, 1.0, "talk", 1, 0))
+        segs = json.load(open(os.path.join(self.write(), "draft_info.json")))["tracks"][0]["segments"]
+        self.assertEqual([s["volume"] for s in segs], [0.0, 0.0, 0.0, 1.0])
+
     def test_name_collision_suffix(self):
         self.write("Same")
         second = self.write("Same")
@@ -114,6 +119,7 @@ class RefreshTemplateTests(unittest.TestCase):
         shutil.copytree(TEMPLATE, self.project)
         os.remove(os.path.join(self.project, "TEMPLATE_INFO.json"))
         # What CapCut leaves in a real project: the clip, backups, this Mac's IDs and paths.
+        os.makedirs(os.path.join(self.project, "Resources", "local"), exist_ok=True)  # git drops empty folders
         open(os.path.join(self.project, "Resources", "local", "IMG_0001.MOV"), "wb").write(b"video")
         open(os.path.join(self.project, "draft_info.json.bak"), "w").write("{}")
         info_path = os.path.join(self.project, "draft_info.json")

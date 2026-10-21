@@ -19,7 +19,7 @@ class E2ETests(unittest.TestCase):
             for n in range(4):
                 make_clip(os.path.join(media, f"c{n}.mp4"), 3.0, creation=f"2026-10-01T1{n}:00:00Z")
             out = os.path.join(d, "out")
-            r = subprocess.run([sys.executable, os.path.join(SCRIPTS, "prepare.py"), media, "--out", out],
+            r = subprocess.run([sys.executable, os.path.join(SCRIPTS, "prepare.py"), media, "--out", out, "--no-speech"],
                                capture_output=True, text=True)
             self.assertEqual(r.returncode, 0, r.stderr)
             self.assertTrue(os.path.exists(os.path.join(out, "sheets", "sheets.json")))
@@ -41,7 +41,7 @@ class E2ETests(unittest.TestCase):
             media = os.path.join(d, "media"); os.makedirs(media)
             make_clip(os.path.join(media, "c0.mp4"), 1.0)
             out = os.path.join(d, "out")
-            subprocess.run([sys.executable, os.path.join(SCRIPTS, "prepare.py"), media, "--out", out], check=True,
+            subprocess.run([sys.executable, os.path.join(SCRIPTS, "prepare.py"), media, "--out", out, "--no-speech"], check=True,
                            capture_output=True)
             save([Shot("missing.mp4", 0, 1, "opener", 1, 0)], os.path.join(out, "cutlist.json"))
             r = subprocess.run([sys.executable, os.path.join(SCRIPTS, "build.py"), out, "--no-capcut"],

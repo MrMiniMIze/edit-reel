@@ -31,7 +31,8 @@ def build_inventory(media_dir):
             skipped.append(name)  # unreadable or unsupported; don't let one bad file sink the run
             continue
         items.append({"file": name, "kind": kind, "duration": info["duration"], "width": info["width"],
-                      "height": info["height"], "fps": info["fps"], "captured": captured})
+                      "height": info["height"], "fps": info["fps"], "has_audio": info["has_audio"],
+                      "captured": captured})
     videos = [i for i in items if i["kind"] == "video"]
     if videos and all(i["captured"] for i in videos):
         order_source = "capture_time"
