@@ -8,7 +8,7 @@
     {
       "name": "edit-reel",
       "source": "./",
-      "description": "Turn a folder of raw phone clips into a ~60s vertical reel (silent mp4 + editable CapCut project)."
+      "description": "Turn a folder of raw phone clips into a ~60s vertical reel (mp4 + editable CapCut project), keeping your talking-to-camera parts."
     }
   ]
 }

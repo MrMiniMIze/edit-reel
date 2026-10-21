@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import capcut  # noqa: E402
 import common  # noqa: E402,F401  (puts ffmpeg-full on PATH)
 import sheets  # noqa: E402
+import speech  # noqa: E402
 
 FILTERS = ["blurdetect", "signalstats", "drawtext", "drawbox", "tile"]
 
@@ -41,5 +42,7 @@ if __name__ == "__main__":
     cc = capcut.draft_problem(capcut.drafts_root())
     if cc:
         print(f"note: {cc}")
+    if speech.problem():
+        print(f"note: finding talking to camera is off: {speech.problem()}")
     print("ready" if not found else "not ready")
     sys.exit(1 if found else 0)

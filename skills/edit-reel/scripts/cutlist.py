@@ -3,7 +3,7 @@ import json
 import math
 from dataclasses import asdict, dataclass
 
-ROLES = ("hook", "opener", "action")
+ROLES = ("hook", "opener", "action", "talk")
 FPS = 30
 
 
@@ -12,11 +12,12 @@ class Shot:
     src: str
     src_in: float
     dur: float
-    role: str      # "hook" | "opener" | "action"
+    role: str      # "hook" | "opener" | "action" | "talk" (talking to camera: keeps its sound)
     stop: int      # 0 for hook shots
-    rank: int      # 1 = strongest action in its stop; 0 for hook/opener
+    rank: int      # 1 = strongest action in its stop; 0 for hook/opener/talk
     why: str = ""
     speed: float = 1.0
+    tight: bool = True  # talk only: cut its pauses and fillers at build time
 
 
 def load(path):
@@ -52,6 +53,8 @@ def validate(shots, inv):
             errors.append(f"{where}: src_in must be >= 0")
         if s.speed != 1.0:
             errors.append(f"{where}: speed must be 1.0")
+        if s.role == "talk" and s.stop < 1:
+            errors.append(f"{where}: talk shots belong to a stop (1 or more), not the hook")
         if s.role == "hook":
             if seen_body:
                 errors.append(f"{where}: hook shots must all come before the body")
@@ -80,19 +83,38 @@ def snap(shots, inv):
         clip = _frames(item["duration"])
         dur = _frames(min(s.dur, clip))
         start = _frames(min(max(s.src_in, 0.0), clip - dur))
-        if not _clean(item, start, dur):
+        # Talk is placed by its words: sliding it off a blurry frame would cut the sentence.
+        if s.role != "talk" and not _clean(item, start, dur):
             offsets = sorted((k / FPS for k in range(-15, 16)), key=abs)
             for off in offsets:
                 cand = _frames(start + off)
                 if 0 <= cand and cand + dur <= clip and _clean(item, cand, dur):
                     start = cand
                     break
-        out.append(Shot(s.src, round(start, 4), round(dur, 4), s.role, s.stop, s.rank, s.why, s.speed))
+        out.append(Shot(s.src, round(start, 4), round(dur, 4), s.role, s.stop, s.rank, s.why, s.speed, s.tight))
+    return out
+
+
+def shaky_talk_edges(shots, inv, edge=0.25):
+    """Talk shots that start or end on a blurry frame: usually the camera being turned or picked up."""
+    items = {i["file"]: i for i in inv["items"]}
+    out = []
+    for s in shots:
+        if s.role != "talk":
+            continue
+        for smp in items[s.src].get("samples") or []:
+            if not smp["usable"] and (s.src_in - 0.05 <= smp["t"] <= s.src_in + edge or
+                                      s.src_in + s.dur - edge <= smp["t"] <= s.src_in + s.dur + 0.05):
+                out.append(f"talk shot {s.src} @ {s.src_in:.2f}-{s.src_in + s.dur:.2f} has a blurry frame at "
+                           f"{smp['t']:.2f}: the camera may be turning; trim it off if no words are lost")
+                break
     return out
 
 
 def fit(shots, target, lo, hi, tolerance):
-    """Drop the weakest actions until the reel is within target + tolerance. Never lengthens."""
+    """Drop the weakest actions until the reel is within target + tolerance. Never lengthens.
+
+    Talk is never dropped: every line stays, and the reel may run past the target to keep it."""
     kept = list(shots)
     total = lambda: sum(s.dur for s in kept)
     while total() > target + tolerance:
@@ -108,6 +130,10 @@ def fit(shots, target, lo, hi, tolerance):
     warnings = []
     if total() < lo:
         warnings.append(f"reel is {total():.1f}s, under the {lo}s minimum: not enough usable footage")
-    if total() > hi:
+    talk = sum(s.dur for s in kept if s.role == "talk")
+    if total() > hi and not talk:
         warnings.append(f"reel is {total():.1f}s, over the {hi}s maximum even after dropping actions")
+    elif total() > target + tolerance and talk:
+        warnings.append(f"reel is {total():.1f}s, over the {target:g}s target: {talk:.1f}s of it is talking, "
+                        "which is always kept")
     return kept, warnings

@@ -227,9 +227,10 @@ def _build_timeline(info, shots, media_dir, size, dst, retouch=None):
             refs = refs[:3] + [e["id"] for e in mine] + refs[3:]
         src_in = int(round(s.src_in * US))
         dur = min(int(round(s.dur * US)), v["duration"] - src_in)
+        vol = 1.0 if s.role == "talk" else 0.0  # talking to camera keeps its sound; the rest waits for voiceover
         seg = copy.deepcopy(tseg)
         seg.update(id=_uid(), material_id=v["id"], extra_material_refs=refs, speed=s.speed,
-                   volume=0.0, last_nonzero_volume=0.0,
+                   volume=vol, last_nonzero_volume=vol,
                    source_timerange={"start": src_in, "duration": int(dur * s.speed)},
                    target_timerange={"start": t, "duration": dur})
         segments.append(seg)
