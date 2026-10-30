@@ -1,6 +1,6 @@
 ---
 name: edit-reel
-description: Auto-edit a folder of raw phone clips from one outing (food, drinks, a day out, a lifestyle vlog) into a ~60s vertical reel with fast hook cuts, as an mp4 plus an editable CapCut desktop project. Finds the parts where the creator talks to the camera, keeps them with their sound, picks the best take, and tightens out pauses. Use when the user says "/edit-reel", "edit these clips", "make a reel from this folder", "make a food reel", "make a lifestyle reel", or asks to revise a reel made this way ("swap the drink shot", "make it 45s").
+description: Auto-edit a folder of raw phone clips from one outing (food, drinks, a day out, a lifestyle vlog) into a ~60s vertical reel with fast hook cuts, as an mp4 plus an editable CapCut desktop project. Finds the parts where the creator talks to the camera, keeps them with their sound, picks the best take, and tightens out pauses; talking reels also get her captions and title. Use when the user says "/edit-reel", "edit these clips", "make a reel from this folder", "make a food reel", "make a lifestyle reel", or asks to revise a reel made this way ("swap the drink shot", "make it 45s").
 ---
 
 # Edit Reel
@@ -14,6 +14,7 @@ You are the editor. Scripts handle the mechanics; you make every taste call by *
 - A media folder (required). Ask only if none was given.
 - The **channel**, which the user names every time: **food** ("make a food reel…") or **lifestyle** ("make a lifestyle reel…"). If they didn't say, ask; don't guess. Both use the same format; they differ only in what a stop is (step 5).
 - Whether it's a **talking vlog** (mostly the creator talking to camera), if the user says so. Otherwise expect a mix of talking and B-roll.
+- Whether it's a **single talking shot** ("it's just a straight shot of me talking", a haul, a basket or cart review, a sit-down): one clip of her talking to camera, no B-roll. Then there's **no hook** and no stops to pick: the reel is her lines in order, trimmed (step 6, "Single talking shot").
 - A length, if the user said one ("make it 45s"). Otherwise the target is 60s. Anything from 30–90s is acceptable.
 
 ## 2. Prepare
@@ -45,7 +46,9 @@ A line is **talking to camera** when it's the creator speaking **and** it's mean
 
 **Takes.** When she says the same line more than once, keep only the **most energetic take** (the most animated face and voice in the frames). If that take doesn't finish the sentence, finish it with the rest of the sentence from her **last** take, as a second talk shot right after.
 
-**Keep every line** that counts, best take only, even if the reel runs past the target. A talking vlog is mostly these lines, with B-roll cut in between.
+**Keep every line** that counts, best take only, even if the reel runs past the target. A talking vlog is mostly these lines, with B-roll cut in between. (A single talking shot is the exception: there, trimming the talk is the whole edit; see step 6.)
+
+**Restarts inside a line.** When she stops mid-sentence and picks it back up ("and I still, I've been using it since middle school"), cut the abandoned words out: end one talk shot just before them and start the next where she restarts. Don't cut on a stretched-out hesitation either ("the Haaaus Labs"): split around it. Whisper's word times are rough, so place these cuts using the pauses in `speech.json` and check the result in `captions.txt` after the build.
 
 Note one line per kept line, e.g. `IMG_7908 1.2-14.7: why the vet (gone two weeks, he's been down); outdoor selfie`.
 
@@ -88,7 +91,7 @@ This style is fast and bright, with hard cuts at about one per second: food-firs
 
 **Talk shots**, from step 4:
 - Place each one in **shooting order**, in the stop it was filmed in, between that stop's B-roll: B-roll from before she spoke goes before it, B-roll from after goes after. A stop can open with talk instead of an opener when that's how it was filmed.
-- `src_in` and `dur` cover the whole line, from just before the first word to just after the last. Use the line's times from `speech.txt`, trimmed to the words you keep. The build cuts the pauses and fillers inside it on its own.
+- `src_in` and `dur` cover the whole line, from just before the first word to just after the last. Use the line's times from `speech.txt`, trimmed to the words you keep. The build snaps both ends to her voice (Whisper's word times run a few tenths early, so leave a little slack rather than cutting tight) and cuts the pauses and fillers inside it on its own.
 - Cut off the **camera moving** at either end: picking the phone up, turning it around, her hand coming toward the lens, tilting it down when she's done. Check the frames at each line's edges (a red-X tile there is a giveaway; the build also warns). A dropped "so" or "okay" at the start is fine; a lost word mid-sentence is not. Exception: the reel's **opening** talking line may keep a little of the swing as she brings the camera up (about 0.2–0.4s); it feels natural there.
 - Close-ups of the pet **looking straight into the camera** are some of the best story beats: look for them (often right after the camera moves in) and include them where they happened.
 - Don't let a B-roll shot repeat the frames of a talk shot.
@@ -99,7 +102,14 @@ This style is fast and bright, with hard cuts at about one per second: food-firs
 - At most one per stop, so the hook previews the variety of the day.
 - Hook moments may reuse body moments.
 
-**Don't:** use speed changes, text, music, transitions or photos, or trim mechanically ("first second of every clip"). Every shot should be a moment you chose by looking at it (or, for talk, by what she says).
+**Single talking shot** (no B-roll, no hook): every shot is `talk`, one stop per thing she covers (one product, one point), in the order she said them. She trims these harder than a vlog:
+- Use the clean take of each line (step 4). Bloopers, "wait, hold on", lines about the filming, and her clicking around on the laptop or phone between items all go.
+- Keep what each item **is** and **why she wants it**. Cut the extra tail once the point is made: hedges and wrap-ups ("but I don't think this one can do me wrong so I'll probably buy this one"), a lead-in that only repeats what's on screen ("this is…" before the shade name), and a sentence that would have to be stitched together from a retake ("so hopefully this can… and remove the redness around my nose"). Keep the asides that sound like her ("I don't know how to say it", "love her") and questions to viewers ("tinted or clear? let me know").
+- The opening line is the hook: start on her first word of the intro, with the title over it (step 7).
+- Keep the sign-off and the ask ("please deinfluence me… give me your recommendations"), all the way to the last word.
+- On the Sephora basket, her final cut was about 13% shorter than the raw clean takes (126s from 144s). Expect a single talking shot to land around 2 minutes; pass a `--target` that keeps every item.
+
+**Don't:** use speed changes, music, transitions or photos, or trim mechanically ("first second of every clip"). Every shot should be a moment you chose by looking at it (or, for talk, by what she says).
 
 ## 7. Write `cutlist.json` in the output dir
 
@@ -117,6 +127,11 @@ This style is fast and bright, with hard cuts at about one per second: food-firs
 - `speed` is always 1.0 (it can be omitted).
 - `talk` shots keep their sound and are never dropped to fit the length. The build splits each into jump cuts with the pauses and fillers removed. Add `"tight": false` to keep a line exactly as spoken.
 - Write a `why` for every shot, so revisions can refer to it.
+- **Text** on any reel with talking (a single talking shot, or a vlog's talking lines; B-roll gets no captions, its voiceover comes later):
+  - `"captions": true` captions every talking line, in her style: one short line of 2–4 words at a time, white, all lowercase except "I", no punctuation, centred a little above the middle of the frame (clear of the laptop or product she holds up).
+  - `"title"`: draft it yourself from what she says in the opening line, and name it in the report so she can change it. It's what the video is, in her words: short, sentence case, no emoji or hashtags, e.g. `"What's in my Sephora sale basket"` for "this is everything in my basket for the Sephora sale". It stays up for the whole opening line (`"title_dur"` to override).
+  - No music: she adds a sound on TikTok when she posts.
+  - `"caption_fixes"`: spellings to correct after you proofread (step 8), e.g. `{"Edem": "eadem", "Hoss Labs": "Haus Labs", "de-influence": "deinfluence"}`. Phrases work, and so do missing sentence breaks: `{"sale and": "sale. and"}` starts a new caption line at "and".
 
 ## 8. Build
 
@@ -128,7 +143,13 @@ python3 "$SKILL_DIR/scripts/build.py" "<output dir>" [--target 45]
 
 **Retouch is on by default:** every clip in the CapCut project gets CapCut's Retouch > Auto styles look ("Native" unless the user saved their own). It's a CapCut Pro feature, so if the user says they don't have CapCut Pro, or asks for no retouch, add `--no-retouch`. The mp4 never has retouch; only the CapCut project does.
 
-It validates the cut list (fix any errors it lists and rerun), tightens talk shots, snaps shots to clean frames, drops the weakest actions if the reel runs long (never talk), renders `reel.mp4` (silent except talk), and writes the CapCut project. If CapCut isn't installed, has never been opened, or is still running, it skips the project with a warning and the mp4 is still made: relay the warning, and after the user fixes it, rerun build.
+It validates the cut list (fix any errors it lists and rerun), tightens talk shots, snaps shots to clean frames, drops the weakest actions if the reel runs long (never talk), captions the talk, renders `reel.mp4` (silent except talk, with the captions and title drawn on), and writes the CapCut project (captions and title as editable text tracks).
+
+**Proofread the captions.** With captions on, the build transcribes the finished talk line by line and writes `captions.txt` (one caption per line, with reel times). Read all of it and fix, via `caption_fixes`:
+- brand and product names, spelled the brand's way (captions are lowercase, so only the letters matter): `eadem`, `rhode`, `dieux`, `haus labs`, `danessa myricks`, `azelaic acid`, `brow wiz`. Look at the product page on screen in the frames when unsure.
+- a caption that runs across two sentences ("cool I also don't"): add the period.
+- her words as she says them: keep "wanna", "gonna", "cause".
+Then rebuild. The transcript is cached, so a fix-only rebuild skips Whisper (the render still takes a few minutes for 4K). If CapCut isn't installed, has never been opened, or is still running, it skips the project with a warning and the mp4 is still made: relay the warning, and after the user fixes it, rerun build.
 
 ## 9. Report
 
@@ -136,6 +157,7 @@ Tell the user, briefly:
 - the stops you found, one line each,
 - the talking lines you kept (a few words each), and any you left out as not to camera, so she can say if you misjudged one,
 - the shot count, the length and the hook count, anything dropped to fit, and any warnings,
+- with text on: the title, and the caption fixes you made,
 - numbered steps:
   1. Watch the reel: `! open "<output dir>/reel.mp4"`
   2. Open **CapCut**, click the project named **`<folder> <date>`** on the home screen.
@@ -155,6 +177,14 @@ If build warns that CapCut's version differs from the template's, or the user sa
 2. Run `python3 "$SKILL_DIR/scripts/refresh_template.py" "<project name>"`. If it refuses, relay its message; it says what to fix.
 3. Rebuild. Every later build uses the refreshed template automatically. It's kept in `~/Library/Application Support/edit-reel/`, so it survives plugin updates. The user can delete the one-clip project afterwards.
 
+## Change the caption look
+
+The captions and title copy the look of her own CapCut post (TikTok Display Medium captions; Scholar Italic title). If she restyles them:
+
+1. Ask her to finish a talking reel in CapCut with the new captions and title, quit with **Cmd+Q**, and tell you the project's name.
+2. Run `python3 "$SKILL_DIR/scripts/capture_text_style.py" "<project name>"`. It reads the text track with the most segments as the captions and a one-segment text track as the title.
+3. Rebuild. Every later build uses the saved look (kept in `~/Library/Application Support/edit-reel/`).
+
 ## Change the retouch look
 
 If the user wants a different retouch look on every reel:
@@ -165,4 +195,4 @@ If the user wants a different retouch look on every reel:
 
 ## Never
 
-Use audio or transcripts to pick B-roll moments, keep sound on anything but talking to camera, cut a talking line mid-sentence, change speed, add text or music, modify the media folder, or modify an existing CapCut project.
+Use audio or transcripts to pick B-roll moments, keep sound on anything but talking to camera, cut a talking line mid-sentence, change speed, add music, put text on a reel without talking, modify the media folder, or modify an existing CapCut project.

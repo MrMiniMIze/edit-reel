@@ -150,6 +150,36 @@ def tighten(t0, t1, pauses, words, fillers, pad=0.08, min_keep=0.15):
     return [(round(s, 3), round(e, 3)) for s, e in spans if e - s >= min_keep]
 
 
+def trim_edges(env, win, t0, t1, style, reach=0.3, gap=0.12, near=0.15, tail=0.15):
+    """Snap a talk line's ends to her voice, by loudness: Whisper's word times are often a few tenths off.
+
+    Leading and trailing quiet is cut down to pad. An end within near s of sound may be inside the last word,
+    so it is pushed out to the next quiet gap (at least gap s long) within reach s, plus tail s: the loudness
+    is measured in the voice band, which barely hears a closing "s". With no gap that close, the end stays
+    where it was (she kept talking, and the cut was meant)."""
+    pad = style["pad"]
+    a, b = int(t0 / win), int(math.ceil(t1 / win))
+    stretch = env[a:b]
+    if not stretch:
+        return t0, t1
+    srt = sorted(stretch)
+    floor, loud = srt[int(len(srt) * 0.1)], srt[int(len(srt) * 0.95)]
+    thr = floor + style["pause_frac"] * (loud - floor)
+    loud_at = [i for i, db in enumerate(stretch) if db >= thr]
+    if not loud_at:
+        return t0, t1
+    start = max(t0, (a + loud_at[0]) * win - pad)
+    end = min(t1, (a + loud_at[-1] + 1) * win + pad)
+    if (len(stretch) - loud_at[-1]) * win <= near:  # cut lands in or right after sound: find the quiet after it
+        need, run = int(round(gap / win)), 0
+        for i in range(a + loud_at[-1] + 1, min(len(env), b + int(reach / win))):
+            run = run + 1 if env[i] < thr else 0
+            if run >= need:
+                end = max(end, (i - run + 1) * win + tail)
+                break
+    return round(start, 3), round(end, 3)
+
+
 def line_pauses(clip, t0, t1, style):
     """Pauses inside [t0, t1], judged against that stretch's own loudness: a long clip's loud moments
     (a shout, a laugh) would otherwise make quiet narration look like silence."""
@@ -171,9 +201,11 @@ def expand_talk(shots, speech, style):
         if s.role != "talk" or not s.tight or not clip:
             out.append(s)
             continue
-        pauses = line_pauses(clip, s.src_in, s.src_in + s.dur, sp)
-        spans = tighten(s.src_in, s.src_in + s.dur, pauses, clip["words"], set(sp["fillers"]),
-                        sp["pad"], sp["min_keep"])
+        t0, t1 = s.src_in, s.src_in + s.dur
+        if clip.get("env") and clip.get("win"):
+            t0, t1 = trim_edges(clip["env"], clip["win"], t0, t1, sp)
+        pauses = line_pauses(clip, t0, t1, sp)
+        spans = tighten(t0, t1, pauses, clip["words"], set(sp["fillers"]), sp["pad"], sp["min_keep"])
         for a, b in spans or [(s.src_in, s.src_in + s.dur)]:
             out.append(Shot(s.src, a, round(b - a, 3), "talk", s.stop, s.rank, s.why, s.speed, tight=False))
     return out

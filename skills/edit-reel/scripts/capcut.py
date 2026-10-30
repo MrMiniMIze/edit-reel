@@ -51,6 +51,7 @@ RETOUCH_FLAG = 1 << 26  # set in a clip's check_flag when Retouch > Auto styles 
 RETOUCH_VIDEO_KEYS = ("beauty_face_auto_preset", "beauty_face_auto_preset_infos")
 USER_RETOUCH = os.path.expanduser("~/Library/Application Support/edit-reel/retouch.json")
 USER_TEMPLATE = os.path.expanduser("~/Library/Application Support/edit-reel/capcut_template")
+USER_TEXT_STYLE = os.path.expanduser("~/Library/Application Support/edit-reel/text_style.json")
 
 
 def template_dir(skill_dir):
@@ -92,6 +93,102 @@ def capture_retouch(project_dir):
     return {"name": v["beauty_face_auto_preset"]["name"], "capcut_version": capcut_version(),
             "draft_placeholder": placeholder,
             "video": {k: copy.deepcopy(v[k]) for k in RETOUCH_VIDEO_KEYS if k in v}, "effects": clean}
+
+
+def text_style_path(skill_dir):
+    """A caption and title look captured on this Mac beats the shipped one."""
+    if os.path.exists(USER_TEXT_STYLE):
+        return USER_TEXT_STYLE
+    return os.path.join(skill_dir, "assets", "text_style.json")
+
+
+def _home_relative(obj):
+    """Font paths point into CapCut's cache under the user's home; store them as ~/... so the look travels."""
+    return json.loads(json.dumps(obj, ensure_ascii=False).replace(os.path.expanduser("~") + "/", "~/"))
+
+
+def _home_absolute(obj):
+    return json.loads(json.dumps(obj, ensure_ascii=False).replace("~/Movies/", os.path.expanduser("~/Movies/")))
+
+
+def capture_text_style(project_dir):
+    """Read the caption and title look off a finished CapCut project: the text track with the most segments
+    is the captions (auto captions included), and a text track with a single segment is the title."""
+    info = json.load(open(os.path.join(project_dir, "draft_info.json")))
+    mats = info["materials"]
+    texts = {m["id"]: m for m in mats.get("texts") or []}
+    templates = {m["id"]: m for m in mats.get("text_templates") or []}
+    anims = {m["id"]: m for m in mats.get("material_animations") or []}
+
+    def text_of(seg):  # auto captions wrap their text in a subtitle template
+        mid = seg["material_id"]
+        if mid in templates:
+            mid = templates[mid]["text_info_resources"][0]["text_material_id"]
+        return texts.get(mid)
+
+    tracks = [t for t in info["tracks"] if t["type"] == "text" and t["segments"] and text_of(t["segments"][0])]
+    if not tracks:
+        raise ValueError(f"'{os.path.basename(project_dir)}' has no text. Add captions (and a title) in CapCut, "
+                         "quit it (Cmd+Q), and try again.")
+    caption_track = max(tracks, key=lambda t: len(t["segments"]))
+    title_track = next((t for t in tracks if t is not caption_track and len(t["segments"]) == 1), None)
+
+    def look(seg):
+        m = copy.deepcopy(text_of(seg))
+        m.pop("id", None)
+        m["words"] = m["current_words"] = {"start_time": [], "end_time": [], "text": []}
+        m["recognize_task_id"] = m["recognize_text"] = ""
+        style = json.loads(m["content"])["styles"][0]
+        return {"material": m, "clip": copy.deepcopy(seg["clip"]), "size": style.get("size", m.get("font_size")),
+                "font_path": style.get("font", {}).get("path") or m.get("font_path", ""),
+                "dur": round(seg["target_timerange"]["duration"] / US, 2)}
+
+    plain = (title_track or caption_track)["segments"][0]
+    segment = {k: copy.deepcopy(v) for k, v in plain.items() if k not in ("id", "material_id")}
+    anim = next((anims[r] for r in plain["extra_material_refs"] if r in anims), None)
+    out = {"capcut_version": capcut_version(), "caption": look(caption_track["segments"][0]),
+           "title": look(title_track["segments"][0]) if title_track else None, "segment": segment,
+           "track": {k: v for k, v in (title_track or caption_track).items() if k not in ("id", "segments")},
+           "animation": {k: v for k, v in anim.items() if k != "id"} if anim else None}
+    out["track"]["flag"] = 0  # a plain text track (auto captions mark theirs as a subtitle track)
+    return _home_relative(out)
+
+
+def _text_tracks(items, look):
+    """CapCut text materials, segments and tracks for the title and caption pages."""
+    look = _home_absolute(look)
+    texts, anims, by_kind = [], [], {"caption": [], "title": []}
+    for n, it in enumerate(items):
+        lk = look[it["kind"]]
+        if not lk:
+            continue
+        m = copy.deepcopy(lk["material"])
+        m["id"] = _uid()
+        content = json.loads(m["content"])
+        n16 = len(it["text"].encode("utf-16-le")) // 2  # CapCut counts style ranges in UTF-16 units
+        for st in content["styles"]:
+            st["range"] = [0, n16]
+        content["text"] = it["text"]
+        m["content"] = json.dumps(content, ensure_ascii=False)
+        texts.append(m)
+        refs = []
+        if look.get("animation"):
+            a = dict(copy.deepcopy(look["animation"]), id=_uid())
+            anims.append(a)
+            refs.append(a["id"])
+        seg = copy.deepcopy(look["segment"])
+        seg.update(id=_uid(), material_id=m["id"], extra_material_refs=refs, clip=copy.deepcopy(lk["clip"]),
+                   target_timerange={"start": int(round(it["t0"] * US)),
+                                     "duration": int(round((it["t1"] - it["t0"]) * US))},
+                   render_index=14000 + n)
+        by_kind[it["kind"]].append(seg)
+    tracks = []
+    for k, kind in enumerate(("caption", "title"), start=1):
+        if by_kind[kind]:
+            for seg in by_kind[kind]:
+                seg["track_render_index"] = k
+            tracks.append(dict(copy.deepcopy(look["track"]), id=_uid(), segments=by_kind[kind]))
+    return texts, anims, tracks
 
 
 def _template_problem(project_dir):
@@ -175,7 +272,7 @@ def _write_json(path, data):
         json.dump(data, f, ensure_ascii=False, separators=(",", ":"))
 
 
-def _build_timeline(info, shots, media_dir, size, dst, retouch=None):
+def _build_timeline(info, shots, media_dir, size, dst, retouch=None, text=None):
     tvid = info["materials"]["videos"][0]
     if "_draftpath_placeholder_" in tvid["path"]:
         draft_ref = tvid["path"].split("/Resources/")[0]
@@ -243,10 +340,20 @@ def _build_timeline(info, shots, media_dir, size, dst, retouch=None):
     info["materials"].update(helpers)
     info["materials"]["effects"] = effects
     info["tracks"] = [dict(info["tracks"][0], segments=segments)]
+    if text and text[0]:
+        texts, anims, tracks = _text_tracks(*text)
+        for tr in tracks:  # video cuts land on frames, so the timeline can end a hair before the last caption
+            for seg in tr["segments"]:
+                tt = seg["target_timerange"]
+                tt["duration"] = min(tt["duration"], t - tt["start"])
+        info["materials"]["texts"] = texts
+        info["materials"]["material_animations"] = anims
+        info["tracks"] += tracks
     return info, videos
 
 
-def write_draft(shots, media_dir, template_dir, root, name, size, check_running=True, retouch=None):
+def write_draft(shots, media_dir, template_dir, root, name, size, check_running=True, retouch=None, text=None):
+    """text: (items, look) to add the title and caption pages as CapCut text, or None."""
     if check_running and capcut_running():
         raise RuntimeError("CapCut is running — quit it (Cmd+Q) and retry")
     name = _free_name(root, name)
@@ -255,7 +362,7 @@ def write_draft(shots, media_dir, template_dir, root, name, size, check_running=
     with open(root_meta_path, "rb") as f:
         original_root_meta = f.read()
     try:
-        return _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path, retouch)
+        return _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path, retouch, text)
     except BaseException:
         # A half-written project shows up in CapCut as broken, so undo everything.
         shutil.rmtree(dst, ignore_errors=True)
@@ -267,13 +374,13 @@ def write_draft(shots, media_dir, template_dir, root, name, size, check_running=
         raise
 
 
-def _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path, retouch):
+def _write(shots, media_dir, template_dir, root, name, dst, size, root_meta_path, retouch, text):
     shutil.copytree(template_dir, dst, ignore=shutil.ignore_patterns("TEMPLATE_INFO.json", "*.bak"))
 
     info = json.load(open(os.path.join(template_dir, "draft_info.json")))
     meta = json.load(open(os.path.join(template_dir, "draft_meta_info.json")))
     old_tl, old_draft = info["id"], meta["draft_id"]
-    info, videos = _build_timeline(info, shots, media_dir, size, dst, retouch)
+    info, videos = _build_timeline(info, shots, media_dir, size, dst, retouch, text)
     new_tl, new_draft = info["id"], _uid()
 
     os.rename(os.path.join(dst, "Timelines", old_tl), os.path.join(dst, "Timelines", new_tl))
