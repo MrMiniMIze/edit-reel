@@ -38,7 +38,9 @@
   "blur_max": "2026-10-19: max lavfi.blur (2fps, 360px wide) over 144 samples inside the reference editor's shots = 8.63; x1.1 = 9.49. All-footage p95 = 7.37, max = 10.10.",
   "luma_min": "Darkest used sample YAVG = 33.2; 25 leaves headroom for night shots.",
   "retouch": "CapCut Retouch > Auto styles on every clip of the CapCut project (a CapCut Pro feature). The mp4 has no retouch.",
-  "speech": "2026-10-21: talking-to-camera shots keep their audio. Pauses are quiet stretches >= min_pause s in the 300-3400 Hz voice band, below floor + pause_frac*(voice - floor) of that clip (floor = 10th, voice = 95th percentile of 20 ms loudness). Tuned 2026-10-21 on 5 real talking lines (43s, incl. a rainy street clip whose noise never fell below -30 dB) by re-transcribing the tightened audio: 0.45/0.06/0.25 lost no words and cut 43.4s to ~38.6s; the earlier 0.3/0.12/0.3 lost 14 words. pad s of air is left on each side of a cut. Line pauses are judged against the line's own loudness, since a shout elsewhere in a long clip made quiet narration read as silence. A sound under min_sound s (a breath, a click) doesn't break a pause; pieces under min_keep s are dropped."
+  "speech": "2026-10-21: talking-to-camera shots keep their audio. Pauses are quiet stretches >= min_pause s in the 300-3400 Hz voice band, below floor + pause_frac*(voice - floor) of that clip (floor = 10th, voice = 95th percentile of 20 ms loudness). Tuned 2026-10-21 on 5 real talking lines (43s, incl. a rainy street clip whose noise never fell below -30 dB) by re-transcribing the tightened audio: 0.45/0.06/0.25 lost no words and cut 43.4s to ~38.6s; the earlier 0.3/0.12/0.3 lost 14 words. pad s of air is left on each side of a cut. Line pauses are judged against the line's own loudness, since a shout elsewhere in a long clip made quiet narration read as silence. A sound under min_sound s (a breath, a click) doesn't break a pause; pieces under min_keep s are dropped.",
+  "captions": "2026-10-30: from the creator's posted Sephora reel (CapCut auto captions, 'page by page short sentence' template): one line of ~2-4 words at a time, no punctuation, TikTok Display Medium size 11 x 0.589 at 63% down; title in Scholar Italic 17.6 x 0.52 at 21% down for the first 3s. CapCut text px = size x scale x width / 170, measured against her frames (captions 80-83 px, title 118 px at 2160 wide). 2026-10-30, her answers: all lowercase (names too, except I); centred 54% down instead of 63%, since she raises the laptop to ~56% and white captions vanished on its screen; title stays up for the whole opening line.",
+  "edges": "2026-10-30: talk line edges snap to her voice by loudness (speech.trim_edges): on the Sephora reel Whisper's word starts were 0.1-0.4 s early and she trimmed every start by hand; the new starts land within ~0.05 s of hers."
  },
  "retouch": true,
  "speech": {
@@ -58,5 +60,11 @@
    "hmm",
    "mm"
   ]
+ },
+ "captions": {
+  "max_chars": 20,
+  "max_words": 4,
+  "lowercase": true,
+  "y": 0.54
  }
 }

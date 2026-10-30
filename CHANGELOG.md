@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.5.0
+
+- **Captions and a title on every reel with talking, in your style.** Set `"captions": true` and a `"title"` in the cut list. Captions show one short line of 2–4 words at a time (TikTok Display Medium, white, all lowercase, a little above the middle so the laptop or product you hold up doesn't hide them); the title is Scholar Italic near the top for your whole opening line, drafted from what you say. Both are copied from your posted Sephora reel and land in the CapCut project as editable text tracks, and are drawn on the mp4 preview too.
+- **Proofread captions.** The finished talk is transcribed line by line into `captions.txt`; brand spellings and missing sentence breaks are fixed with `"caption_fixes"` (`{"Edem": "eadem", "sale and": "sale. and"}`).
+- **Your own caption look:** finish a reel in CapCut with your captions and title, then run `capture_text_style.py`.
+- **Single talking shot.** A straight shot of you talking (a haul, a basket review) gets no hook and is trimmed harder, the way you trimmed the Sephora reel: restarts, hedges and stitched-together endings go; what each item is and why you want it stays.
+- **Talking clips start and end on your voice.** Line edges now snap to the sound itself instead of Whisper's word times (which ran 0.1–0.4s early, so you had been trimming every start by hand), and the last word is no longer clipped.
+
 ## 0.4.0
 
 - **Talking to camera keeps its sound.** Prepare transcribes every clip on your Mac (Whisper, nothing is uploaded) and makes speech sheets, so Claude can tell when you're talking to viewers, even with the phone propped up and you looking away. Talking to your pet, a friend or staff stays silent B-roll, and talk about the filming itself ("I don't know how this angle's gonna work") is cut.

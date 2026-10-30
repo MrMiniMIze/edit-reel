@@ -7,6 +7,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import capcut  # noqa: E402
+import captions  # noqa: E402
 import cutlist  # noqa: E402
 import render  # noqa: E402
 import speech  # noqa: E402
@@ -51,7 +52,20 @@ def main():
 
     size = render.output_size(inv)
     reel = os.path.join(out, "reel.mp4")
-    render.render(shots, inv["media_dir"], reel, size, fps=style["fps"])
+    text = cutlist.load_text(path)
+    look = captions.place(json.load(open(capcut.text_style_path(SKILL))), style["captions"].get("y"))
+    pages = []
+    if text["captions"]:
+        if not any(s.role == "talk" for s in shots):
+            warnings.append("captions are on but there is no talking to caption")
+        else:
+            pages = captions.make(shots, inv["media_dir"], out, text["caption_fixes"], style)
+    if text["title"] and not look.get("title"):
+        warnings.append("no title look saved: the title is left out (see SKILL.md, \"Change the caption look\")")
+    # The title stays up for the whole opening line, unless the cut list says otherwise.
+    title_dur = text["title_dur"] or captions.opening_line_end(shots) or (look["title"] or {}).get("dur") or 3.0
+    items = captions.items(text["title"] if look.get("title") else "", title_dur, pages)
+    render.render(shots, inv["media_dir"], reel, size, fps=style["fps"], text=captions.drawtext(items, look, size))
 
     draft = None
     problem = None if args.no_capcut else capcut.draft_problem(capcut.drafts_root())
@@ -70,7 +84,7 @@ def main():
             retouch = json.load(open(capcut.retouch_path(SKILL)))
         try:
             draft = capcut.write_draft(shots, inv["media_dir"], template, capcut.drafts_root(), name, size,
-                                       retouch=retouch)
+                                       retouch=retouch, text=(items, look) if items else None)
         except RuntimeError as e:
             warnings.append(f"CapCut project not written: {e}")
 
@@ -85,6 +99,9 @@ def main():
         print(f"dropped to fit length: stop {s.stop} {s.src} @ {s.src_in} (rank {s.rank})")
     for w in warnings:
         print(f"WARNING: {w}")
+    if items:
+        print(f"text: {'title + ' if text['title'] and look.get('title') else ''}{len(pages)} caption pages" +
+              (f" (proofread {os.path.join(out, 'captions.txt')})" if pages else ""))
     print(f"mp4: {reel}")
     if draft:
         print(f"CapCut project: {os.path.basename(draft)}" +

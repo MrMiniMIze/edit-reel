@@ -28,6 +28,14 @@ def load_target(path):
     return json.load(open(path)).get("target")
 
 
+def load_text(path):
+    """The cut list's text settings: "title" (shown over the opening), "captions" (true for talking reels)
+    and "caption_fixes" (spellings Whisper gets wrong, e.g. brand names)."""
+    d = json.load(open(path))
+    return {"title": d.get("title") or "", "title_dur": d.get("title_dur"), "captions": bool(d.get("captions")),
+            "caption_fixes": d.get("caption_fixes") or {}}
+
+
 def save(shots, path, target=None):
     with open(path, "w") as f:
         json.dump({"target": target, "shots": [asdict(s) for s in shots]}, f, indent=1)

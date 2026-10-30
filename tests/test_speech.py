@@ -188,7 +188,8 @@ class SpeechE2ETests(unittest.TestCase):
             final = json.load(open(os.path.join(out, "cutlist.final.json")))["shots"]
             talk = [s for s in final if s["role"] == "talk"]
             self.assertGreaterEqual(len(talk), 2, "the pause should split the line into jump cuts")
-            self.assertLess(sum(s["dur"] for s in talk), t1 - t0 - 1.0)
+            # The end may move out by up to reach + tail to finish a word Whisper ended early.
+            self.assertLess(sum(s["dur"] for s in talk), t1 - t0 + 0.45 - 1.0)
             info = common.probe(os.path.join(out, "reel.mp4"))
             self.assertTrue(info["has_audio"])
             self.assertIn("talking:", r.stdout)
