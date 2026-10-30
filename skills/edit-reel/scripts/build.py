@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import capcut  # noqa: E402
 import cutlist  # noqa: E402
 import render  # noqa: E402
+import speech  # noqa: E402
 
 SKILL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
 
@@ -33,10 +34,18 @@ def main():
             print(f"  - {e}")
         sys.exit(1)
 
+    sp_path = os.path.join(out, "speech.json")
+    if any(s.role == "talk" for s in shots):
+        if not os.path.exists(sp_path):
+            print("cutlist.json has talk shots but there is no speech.json: rerun prepare.py")
+            sys.exit(1)
+        shots = speech.expand_talk(shots, json.load(open(sp_path)), style)
+
     ln = style["length"]
     target = args.target or cutlist.load_target(path) or ln["target"]
     before = cutlist.snap(shots, inv)
     shots, warnings = cutlist.fit(before, target, ln["min"], ln["max"], ln["tolerance"])
+    warnings += cutlist.shaky_talk_edges(shots, inv)
     dropped = [s for s in before if s not in shots]
     cutlist.save(shots, os.path.join(out, "cutlist.final.json"), target=target)
 
@@ -67,9 +76,11 @@ def main():
 
     hooks = sum(s.role == "hook" for s in shots)
     stops = len({s.stop for s in shots if s.role != "hook"})
-    body = [s.dur for s in shots if s.role != "hook"]
+    body = [s.dur for s in shots if s.role not in ("hook", "talk")]
+    talk = [s.dur for s in shots if s.role == "talk"]
     print(f"stops: {stops} | shots: {len(shots)} ({hooks} hook) | length: {sum(s.dur for s in shots):.1f}s "
-          f"(target {target:g}s) | mean body shot: {sum(body) / max(len(body), 1):.2f}s")
+          f"(target {target:g}s) | mean body shot: {sum(body) / max(len(body), 1):.2f}s" +
+          (f" | talking: {sum(talk):.1f}s in {len(talk)} cuts, with sound" if talk else ""))
     for s in dropped:
         print(f"dropped to fit length: stop {s.stop} {s.src} @ {s.src_in} (rank {s.rank})")
     for w in warnings:

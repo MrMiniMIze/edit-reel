@@ -10,6 +10,7 @@ import check  # noqa: E402
 import ingest  # noqa: E402
 import screen  # noqa: E402
 import sheets  # noqa: E402
+import speech  # noqa: E402
 
 STYLE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "style.json")
 
@@ -27,6 +28,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("media_dir")
     ap.add_argument("--out")
+    ap.add_argument("--no-speech", action="store_true", help="skip finding talking to camera")
     args = ap.parse_args()
     found = check.problems()
     if found:
@@ -45,6 +47,16 @@ def main():
     idx = sheets.make_sheets(inv, sheets.sample_times(inv, sh["max_frames"], sh["base_fps"]),
                              os.path.join(out, "sheets"), sh["cols"], sh["rows"])
 
+    talk_note = None
+    if args.no_speech:
+        talk_note = "skipped (--no-speech)"
+    elif speech.problem():
+        talk_note = f"off: {speech.problem()}"
+    else:
+        _, lines = speech.analyze(inv, out, style)
+        talk_note = f"{lines} spoken lines in {os.path.join(out, 'speech.txt')}, sheets in " \
+                    f"{os.path.join(out, 'speech_sheets')}"
+
     videos = [i for i in inv["items"] if i["kind"] == "video"]
     print(f"output dir: {out}")
     print(f"clips: {len(videos)} videos ({sum(i['duration'] for i in videos):.0f}s), "
@@ -54,6 +66,7 @@ def main():
     if inv["skipped"]:
         print(f"skipped (unreadable): {', '.join(inv['skipped'])}")
     print(f"sheets: {len(idx)} in {os.path.join(out, 'sheets')}")
+    print(f"speech: {talk_note}")
 
 
 if __name__ == "__main__":

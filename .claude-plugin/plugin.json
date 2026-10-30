@@ -1,7 +1,7 @@
 {
   "name": "edit-reel",
-  "version": "0.3.0",
-  "description": "Turn a folder of raw phone clips into a ~60s vertical reel: a silent mp4 plus an editable CapCut desktop project. Claude picks every shot by looking at the footage.",
+  "version": "0.4.0",
+  "description": "Turn a folder of raw phone clips into a ~60s vertical reel: an mp4 plus an editable CapCut desktop project. Claude picks every shot by looking at the footage, and keeps your talking-to-camera parts with their sound.",
   "author": { "name": "Christopher Pena" },
   "homepage": "https://github.com/MrMiniMIze/edit-reel",
   "repository": "https://github.com/MrMiniMIze/edit-reel",

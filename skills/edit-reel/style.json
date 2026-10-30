@@ -37,7 +37,26 @@
  "_notes": {
   "blur_max": "2026-10-19: max lavfi.blur (2fps, 360px wide) over 144 samples inside the reference editor's shots = 8.63; x1.1 = 9.49. All-footage p95 = 7.37, max = 10.10.",
   "luma_min": "Darkest used sample YAVG = 33.2; 25 leaves headroom for night shots.",
-  "retouch": "CapCut Retouch > Auto styles on every clip of the CapCut project (a CapCut Pro feature). The mp4 has no retouch."
+  "retouch": "CapCut Retouch > Auto styles on every clip of the CapCut project (a CapCut Pro feature). The mp4 has no retouch.",
+  "speech": "2026-10-21: talking-to-camera shots keep their audio. Pauses are quiet stretches >= min_pause s in the 300-3400 Hz voice band, below floor + pause_frac*(voice - floor) of that clip (floor = 10th, voice = 95th percentile of 20 ms loudness). Tuned 2026-10-21 on 5 real talking lines (43s, incl. a rainy street clip whose noise never fell below -30 dB) by re-transcribing the tightened audio: 0.45/0.06/0.25 lost no words and cut 43.4s to ~38.6s; the earlier 0.3/0.12/0.3 lost 14 words. pad s of air is left on each side of a cut. Line pauses are judged against the line's own loudness, since a shout elsewhere in a long clip made quiet narration read as silence. A sound under min_sound s (a breath, a click) doesn't break a pause; pieces under min_keep s are dropped."
  },
- "retouch": true
+ "retouch": true,
+ "speech": {
+  "min_pause": 0.45,
+  "min_sound": 0.06,
+  "pause_frac": 0.25,
+  "pad": 0.08,
+  "min_keep": 0.25,
+  "fillers": [
+   "um",
+   "umm",
+   "uh",
+   "uhh",
+   "uhm",
+   "er",
+   "erm",
+   "hmm",
+   "mm"
+  ]
+ }
 }
